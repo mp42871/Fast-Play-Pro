@@ -4,13 +4,19 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>FastPlay Pro — Local Basketball Playbook Studio</title>
+    <meta name="description" content="Draw, animate and share basketball plays. Works offline and syncs through Google Drive." />
+    <meta name="theme-color" content="#0f172a" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="icon" href="icons/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="icons/icon-32.png" sizes="32x32" type="image/png" />
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="apple-mobile-web-app-title" content="FastPlay" />
     <!--
-        OFFLINE SUPPORT: each library loads from a local ./vendor/ copy first and falls back to the CDN.
-        To run fully offline, save these three files next to this page:
-          vendor/tailwind.js        <- https://cdn.tailwindcss.com/3.4.17
-          vendor/phosphor.js        <- https://unpkg.com/@phosphor-icons/web@2.1.1
-          vendor/jspdf.umd.min.js   <- https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js
-        Fonts fall back to system fonts automatically.
+        OFFLINE SUPPORT: the three libraries ship in ./vendor/ (the CDN is only a fallback), and sw.js caches
+        the whole app after the first visit so it opens with no internet. See README.md.
     -->
     <script>
         window.__fpLoadLib = function (local, cdn) {
@@ -203,7 +209,7 @@
                     <option value="nfhs">High School</option>
                     <option value="fiba">FIBA</option>
                 </select>
-                <span class="mr-auto inline-flex items-center space-x-1 text-[10px] font-mono text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded shrink-0">
+                <span id="top-save-pill" class="mr-auto inline-flex items-center space-x-1 text-[10px] font-mono text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded shrink-0" title="Save status">
                     <i class="ph-fill ph-check-circle"></i>
                     <span id="top-save-status-text">Saved</span>
                 </span>
@@ -267,7 +273,7 @@
                     <option value="nfhs">High School</option>
                     <option value="fiba">FIBA</option>
             </select>
-            <span class="inline-flex items-center space-x-1 text-[10px] font-mono text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-1.5 py-0.5 rounded shrink-0 ml-auto">
+            <span id="mobile-save-pill" class="inline-flex items-center space-x-1 text-[10px] font-mono text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-1.5 py-0.5 rounded shrink-0 ml-auto" title="Save status">
                 <i class="ph-fill ph-check-circle"></i>
                 <span id="mobile-save-status-text">Saved</span>
             </span>
@@ -558,6 +564,13 @@
                         <g id="court-render-root"></g>
                     </svg>
 
+                    <!-- COURT ZOOM (pinch with two fingers, Ctrl + scroll, or these buttons) -->
+                    <div id="court-zoom-controls" class="absolute top-2 right-2 z-[5] flex items-center bg-slate-900/90 border border-slate-700 rounded-lg shadow-lg overflow-hidden no-print">
+                        <button id="btn-zoom-out" class="w-8 h-8 flex items-center justify-center text-slate-200 hover:bg-slate-800 disabled:opacity-30 disabled:hover:bg-transparent" title="Zoom out (-)" aria-label="Zoom out"><i class="ph-bold ph-minus text-sm"></i></button>
+                        <button id="btn-zoom-reset" class="h-8 min-w-[46px] px-1 text-[11px] font-mono font-bold text-slate-200 hover:bg-slate-800 border-x border-slate-700" title="Fit whole court (0)" aria-label="Fit whole court">100%</button>
+                        <button id="btn-zoom-in" class="w-8 h-8 flex items-center justify-center text-slate-200 hover:bg-slate-800 disabled:opacity-30 disabled:hover:bg-transparent" title="Zoom in (+)" aria-label="Zoom in"><i class="ph-bold ph-plus text-sm"></i></button>
+                    </div>
+
                     <!-- EMPTY PLAYBOOK OVERLAY -->
                     <div id="empty-playbook-overlay" class="hidden absolute inset-0 z-10 flex items-center justify-center p-3 bg-slate-950/65 backdrop-blur-[2px]">
                         <div class="bg-slate-900 border border-slate-700 rounded-2xl p-4 sm:p-6 max-w-sm w-full text-center shadow-2xl space-y-3.5">
@@ -796,7 +809,7 @@
             <div class="px-4 sm:px-5 py-3.5 border-b border-slate-800 flex items-center justify-between shrink-0">
                 <div class="flex items-center space-x-2">
                     <i class="ph-bold ph-floppy-disk text-sky-400 text-lg"></i>
-                    <h2 class="text-sm font-bold text-white">Local Playbook Storage &amp; Backups</h2>
+                    <h2 class="text-sm font-bold text-white">Storage, Backups &amp; Sync</h2>
                 </div>
                 <button id="btn-close-storage" class="min-w-[32px] min-h-[32px] flex items-center justify-center rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition">
                     <i class="ph-bold ph-x text-base"></i>
@@ -806,12 +819,37 @@
                 <div class="bg-slate-950 border border-slate-800 rounded-xl p-3 flex items-center justify-between">
                     <div class="min-w-0 pr-2">
                         <div class="text-slate-400 truncate">Active Play: <span id="storage-current-play-name" class="text-white font-bold">None</span></div>
-                        <div class="text-slate-400 mt-0.5">Auto-saved in browser <code class="text-emerald-400">localStorage</code> (100% offline).</div>
+                        <div class="text-slate-400 mt-0.5">Auto-saved on this device (works offline).</div>
                     </div>
                     <div class="text-right shrink-0 ml-2">
                         <div id="storage-total-plays" class="text-lg font-extrabold text-orange-400">0</div>
                         <div class="text-[10px] text-slate-400 uppercase">Plays</div>
                     </div>
+                </div>
+
+                <!-- Google Drive sync -->
+                <div id="drive-sync-card" class="bg-slate-950 border border-slate-800 rounded-xl p-3 space-y-2">
+                    <div class="flex items-center justify-between gap-2">
+                        <div class="flex items-center space-x-2 font-bold text-white text-[13px]">
+                            <i class="ph-bold ph-cloud-arrow-up text-sky-400 text-base"></i><span>Sync with Google Drive</span>
+                        </div>
+                        <span id="drive-sync-badge" class="text-[10px] font-mono uppercase px-1.5 py-0.5 rounded border border-slate-700 text-slate-400">Off</span>
+                    </div>
+                    <p id="drive-sync-text" class="text-[11px] text-slate-400 leading-relaxed">Keep every playbook in sync across your phone, tablet and computer. Your plays are saved to a file in your own Google Drive.</p>
+                    <div class="flex flex-wrap gap-2">
+                        <button id="btn-drive-connect" class="min-h-[34px] px-3 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-500 text-white font-bold transition">Connect Google Drive</button>
+                        <button id="btn-drive-sync-now" class="hidden min-h-[34px] px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-sky-300 font-semibold transition">Sync Now</button>
+                        <button id="btn-drive-disconnect" class="hidden min-h-[34px] px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 font-semibold transition">Disconnect</button>
+                    </div>
+                </div>
+
+                <!-- Install as an app -->
+                <div id="install-card" class="hidden bg-slate-950 border border-slate-800 rounded-xl p-3 flex items-center justify-between gap-3">
+                    <div class="min-w-0">
+                        <div class="font-bold text-white text-[13px]">Install FastPlay Pro</div>
+                        <p id="install-text" class="text-[11px] text-slate-400 leading-relaxed">Add it to your home screen or desktop. It opens like an app and works without internet.</p>
+                    </div>
+                    <button id="btn-install-app" class="hidden shrink-0 min-h-[34px] px-3 py-1.5 rounded-lg bg-orange-500 hover:bg-orange-600 text-white font-bold transition">Install</button>
                 </div>
 
                 <!-- Storage usage meter & backup reminder -->
@@ -824,6 +862,10 @@
                         <div id="storage-usage-bar" class="h-full bg-emerald-500 rounded-full transition-all" style="width:0%"></div>
                     </div>
                     <div id="storage-backup-text" class="text-[11px] text-slate-400">Last full backup: never</div>
+                    <div class="flex items-center justify-between gap-2 text-[11px]">
+                        <span id="storage-persist-text" class="text-slate-400">Checking whether the browser may clear this data...</span>
+                        <button id="btn-storage-persist" class="hidden shrink-0 min-h-[28px] px-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-emerald-300 font-semibold transition">Protect</button>
+                    </div>
                 </div>
 
                 <!-- Pending Multi-Play Import Decision Card -->
@@ -1179,7 +1221,7 @@
         /**
          * FastPlayStudio — Complete 100% Local Basketball Playbook Studio
          * Features:
-         * - Local localStorage persistence & .json import/export (Merge vs. Replace)
+         * - On-device persistence (IndexedDB + localStorage mirror), Google Drive sync & .json import/export
          * - Anchor Action Lines to Players (Auto-Follow) with Snap toggle & Inspector controls
          * - Per-play Undo/Redo (50 steps), Safe Play Deletion with Undo Toast
          * - Multi-Pass & Pass-to-Shot sequential animation engine
@@ -1288,6 +1330,7 @@
                 this.syncAllUI();
                 this.renderCourt();
                 this.maybeOfferTour();
+                if (this.initExtensions) this.initExtensions();
             }
 
             // A normal reload (F5) can restore stale form values and disabled states from the previous page.
@@ -1706,7 +1749,7 @@
             loadFromLocalStorage() {
                 this.books = []; this.currentBookId = null; this.currentPlayId = null; this.currentFrameIndex = 0;
                 let raw = null;
-                const keepCopy = () => { try { localStorage.setItem(this.STORAGE_KEY + '_corrupt', raw); } catch (_) {} };
+                const keepCopy = () => { if (window.FPStore) window.FPStore.setAux('corrupt', raw); try { localStorage.setItem(this.STORAGE_KEY + '_corrupt', raw); } catch (_) {} };
                 const finish = () => {
                     if (!this.books.length) this.books.push(this.newBook('My Playbook'));
                     if (!this.currentBook()) this.currentBookId = this.books[0].id;
@@ -1716,35 +1759,11 @@
                     try { const pr = JSON.parse(localStorage.getItem(this.STORAGE_KEY + '_prefs') || '{}'); if (['pos', 'num', 'name'].includes(pr.labelMode)) this.labelMode = pr.labelMode; } catch (_) {}
                 };
                 try {
-                    raw = localStorage.getItem(this.STORAGE_KEY);
+                    raw = window.FPStore ? window.FPStore.readMain() : localStorage.getItem(this.STORAGE_KEY);
                     if (!raw) return finish();
-                    const parsed = JSON.parse(raw);
-                    let dropped = 0;
-                    const loadPlays = (arr) => {
-                        const list = Array.isArray(arr) ? arr : [], seen = new Set();
-                        const out = list.map(p => this.normalizePlay(p, false)).filter(p => p && !seen.has(p.id) && seen.add(p.id));
-                        dropped += list.length - out.length;
-                        return out;
-                    };
-                    if (parsed && Array.isArray(parsed.books)) {
-                        parsed.books.forEach(b => {
-                            if (!b || typeof b !== 'object') return;
-                            const book = this.newBook(String(b.name || 'Playbook').slice(0, 60));
-                            if (typeof b.id === 'string' && b.id && b.id.length <= 64 && !this.books.some(x => x.id === b.id)) book.id = b.id;
-                            book.plays = loadPlays(b.plays);
-                            book.currentPlayId = typeof b.currentPlayId === 'string' ? b.currentPlayId : null;
-                            book.roster = this.normalizeRoster(b.roster);
-                            book.practices = this.normalizePractices(b.practices);
-                            this.books.push(book);
-                        });
-                        this.currentBookId = parsed.currentBookId;
-                    } else if (parsed && Array.isArray(parsed.plays)) {
-                        // Older single-playbook save
-                        const book = this.newBook('My Playbook');
-                        book.plays = loadPlays(parsed.plays);
-                        book.currentPlayId = parsed.currentPlayId;
-                        this.books.push(book);
-                    } else throw new Error('Unexpected storage format');
+                    const res = this.booksFromSaved(JSON.parse(raw));
+                    this.books = res.books; this.currentBookId = res.currentBookId;
+                    const dropped = res.dropped;
                     if (dropped) {
                         keepCopy();
                         setTimeout(() => this.showToast('Some saved plays were invalid; a raw copy was kept.', 'error', null, null, 6000), 600);
@@ -1755,6 +1774,39 @@
                     if (raw) { keepCopy(); setTimeout(() => this.showToast('Saved data was unreadable; a copy was kept.', 'error', null, null, 6000), 600); }
                 }
                 finish();
+            }
+
+
+            // Turns a saved/synced playbook object into validated books (shared by local load and Drive sync)
+            booksFromSaved(parsed) {
+                const books = []; let currentBookId = null;
+                let dropped = 0;
+                const loadPlays = (arr) => {
+                    const list = Array.isArray(arr) ? arr : [], seen = new Set();
+                    const out = list.map(p => this.normalizePlay(p, false)).filter(p => p && !seen.has(p.id) && seen.add(p.id));
+                    dropped += list.length - out.length;
+                    return out;
+                };
+                if (parsed && Array.isArray(parsed.books)) {
+                    parsed.books.forEach(b => {
+                        if (!b || typeof b !== 'object') return;
+                        const book = this.newBook(String(b.name || 'Playbook').slice(0, 60));
+                        if (typeof b.id === 'string' && b.id && b.id.length <= 64 && !books.some(x => x.id === b.id)) book.id = b.id;
+                        book.plays = loadPlays(b.plays);
+                        book.currentPlayId = typeof b.currentPlayId === 'string' ? b.currentPlayId : null;
+                        book.roster = this.normalizeRoster(b.roster);
+                        book.practices = this.normalizePractices(b.practices);
+                        books.push(book);
+                    });
+                    currentBookId = parsed.currentBookId;
+                } else if (parsed && Array.isArray(parsed.plays)) {
+                    // Older single-playbook save
+                    const book = this.newBook('My Playbook');
+                    book.plays = loadPlays(parsed.plays);
+                    book.currentPlayId = parsed.currentPlayId;
+                    books.push(book);
+                } else throw new Error('Unexpected storage format');
+                return { books, currentBookId, dropped };
             }
 
             // Validates and sanitizes a play (from storage or an imported file). Returns null if unusable.
@@ -1836,7 +1888,9 @@
 
             backupPlaybook() {
                 if (!this.plays.length) return;
-                try { localStorage.setItem(this.STORAGE_KEY + '_backup', JSON.stringify({ savedAt: new Date().toISOString(), plays: this.plays })); } catch (_) {}
+                const data = JSON.stringify({ savedAt: new Date().toISOString(), bookId: this.currentBookId, plays: this.plays });
+                if (window.FPStore && window.FPStore.idbAvailable()) { window.FPStore.setAux('backup', data); return; }
+                try { localStorage.setItem(this.STORAGE_KEY + '_backup', data); } catch (_) {}
             }
 
             restorePlaybook(snap) {
@@ -1899,14 +1953,15 @@
                     this.syncAllUI(); this.applyLayoutState(); this.resizeCourtCanvas(); this.renderCourt();
                 });
                 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') flush(); });
-                window.addEventListener('storage', (e) => {
-                    if (e.key !== this.STORAGE_KEY) return;
+                const otherTab = () => {
                     this.showToast('Edited in another tab. Reload?', 'error', 'Reload', () => {
                         this.dirty = false;
                         if (this.saveTimer) clearTimeout(this.saveTimer);
                         location.reload();
                     }, 12000);
-                });
+                };
+                window.addEventListener('storage', (e) => { if (e.key === this.STORAGE_KEY) otherTab(); });
+                if (window.FPStore) window.FPStore.onOtherTabSave(otherTab);
             }
 
             decorateAccessibility() {
@@ -1932,13 +1987,30 @@
                     const book = this.currentBook();
                     if (book) book.currentPlayId = this.currentPlayId;
                     // "plays"/"currentPlayId" mirror the open playbook so older builds can still read it
-                    localStorage.setItem(this.STORAGE_KEY, JSON.stringify({
-                        version: 4, savedAt: new Date().toISOString(),
+                    const savedAt = new Date().toISOString();
+                    const raw = JSON.stringify({
+                        version: 4, savedAt,
                         currentBookId: this.currentBookId, books: this.books,
                         currentPlayId: this.currentPlayId, plays: this.plays
-                    }));
+                    });
                     this.dirty = false;
-                    this.setSaveIndicator('saved');
+                    if (!window.FPStore) {
+                        localStorage.setItem(this.STORAGE_KEY, raw);
+                        this.setSaveIndicator('saved');
+                    } else {
+                        // IndexedDB holds the real copy (no 5 MB cap); localStorage keeps a mirror while it fits
+                        const token = (this._saveSeq = (this._saveSeq || 0) + 1);
+                        window.FPStore.writeMain(raw, Date.parse(savedAt)).then(ok => {
+                            if (token !== this._saveSeq) return;
+                            if (!ok) throw new Error('No storage available');
+                            this.setSaveIndicator('saved');
+                            if (this.afterLocalSave) this.afterLocalSave();
+                        }).catch(err => {
+                            console.error('Save failed:', err);
+                            this.setSaveIndicator('error');
+                            this.showToast('Could not save in this browser \u2014 export a .json backup.', 'error');
+                        });
+                    }
                 } catch (err) {
                     console.error('Save failed:', err);
                     this.setSaveIndicator('error');
@@ -1949,6 +2021,8 @@
             setSaveIndicator(state) {
                 const t = document.getElementById('top-save-status-text');
                 const m = document.getElementById('mobile-save-status-text');
+                this.localSaveState = state;
+                if (this.renderStatusPill) return this.renderStatusPill();
                 if (t) t.textContent = state === 'saving' ? 'Saving...' : state === 'error' ? 'Save Error' : 'Saved';
                 if (m) m.textContent = state === 'saving' ? 'Saving...' : state === 'error' ? 'Error' : 'Saved';
             }
@@ -2219,6 +2293,7 @@
                 const w = Math.max(160, targetW);
                 const h = Math.max(150, targetH);
                 svg.setAttribute('viewBox', `0 0 ${vbW} ${vbH}`);
+                if (this.applyCourtZoom) this.applyCourtZoom();
                 svg.setAttribute('width', String(w));
                 svg.setAttribute('height', String(h));
                 svg.style.width = `${w}px`;
@@ -3775,9 +3850,10 @@
                 const rect = svg.getBoundingClientRect();
                 const vbW = 500;
                 const vbH = this.courtType === 'full' ? 940 : 470;
-                const sy = ((clientY - rect.top) / (rect.height || 1)) * vbH;
+                const vb = this.courtViewBox ? this.courtViewBox() : { x: 0, y: 0, w: vbW, h: vbH };   // zoomed-in view
+                const sy = vb.y + ((clientY - rect.top) / (rect.height || 1)) * vb.h;
                 return {
-                    x: this.clamp(Math.round(((clientX - rect.left) / (rect.width || 1)) * vbW), 8, vbW - 8),
+                    x: this.clamp(Math.round(vb.x + ((clientX - rect.left) / (rect.width || 1)) * vb.w), 8, vbW - 8),
                     // Data is always stored hoop-at-top; when the hoop is shown at the bottom, screen Y is inverted
                     y: this.clamp(Math.round(this.isHoopBottom() ? vbH - sy : sy), 8, vbH - 8)
                 };
@@ -6577,7 +6653,8 @@ ${act('tour', 'Take the guided tour')} ${act('templates', 'Open the template lib
 <li><b>Court markings</b>: NBA (16 ft lane, 23 ft 9 in arc), NCAA (12 ft lane, 22 ft 1.75 in arc), High School (12 ft lane, 19 ft 9 in arc, no restricted area) and FIBA (4.9 m lane, 6.75 m arc). Each play remembers its own.</li>
 <li><b>Hoop Top / Bottom</b> and <b>themes</b> are saved per play too.</li>
 <li><b>Guides</b>: shows labeled landmarks (blocks, elbows, nail, slots, wings, corners, dunker spots). With guides on, players, cones, labels and line ends snap to these spots when you drag near them.</li>
-<li><b>Ghost</b> (<kbd>G</kbd>): shows the previous frame faintly behind the current one so spacing stays consistent from frame to frame.</li></ul>` },
+<li><b>Ghost</b> (<kbd>G</kbd>): shows the previous frame faintly behind the current one so spacing stays consistent from frame to frame.</li>
+<li><b>Zoom</b>: pinch with two fingers to zoom in on a crowded spot, and drag with two fingers to move around. On a computer use the <b>&minus; / + buttons</b> at the top right of the court, <kbd>Ctrl</kbd> + scroll (or pinch on a trackpad), scroll to move around, and <kbd>0</kbd> to see the whole court again. Zoom only changes your view: exports and PDFs always show the whole court.</li></ul>` },
 
                     { id: 'animation', title: 'Animation & Timing', html: `
 <h3>Running your play</h3>
@@ -6661,24 +6738,47 @@ ${act('templates', 'Open the template library')}` },
 
                     { id: 'saving', title: 'Saving, Backups & Storage', html: `
 <h3>How your work is saved</h3>
-<p>Everything saves automatically to this browser's local storage a moment after each change (watch the <b>Saved</b> indicator). Saved data stays on this device and this browser only. Another computer, another browser, or a private window will not see it.</p>
-<div class="tip">Clearing browser data or "site data" erases your playbooks. Export a backup regularly; the Save / Load window reminds you when your last backup is more than 7 days old.</div>
+<p>Everything saves automatically on this device a moment after each change. The indicator at the top shows <b>Saved</b> (or <b>Synced</b> when Drive sync is on). There is no practical size limit: large playbooks with many frames and drawings are fine.</p>
+<p>Saved data stays on this device and in this browser. To have your plays on your phone, tablet and computer, turn on <b>Google Drive sync</b> (see <i>Sync Between Devices</i>).</p>
+<div class="tip">Clearing browser data or "site data" erases what's saved on this device. Drive sync or a regular .json export keeps a copy safe; you'll get a reminder when your last backup is more than a week old.</div>
 <h4>The Save / Load window</h4>
-<ul><li><b>Export Full Playbook</b>: a .json file of the open playbook, including its roster and practice plans.</li>
+<ul><li><b>Sync with Google Drive</b>: connect, sync now, or disconnect.</li>
+<li><b>Install FastPlay Pro</b>: shown when your browser can add it to your home screen or desktop.</li>
+<li><b>Storage</b>: how much your playbooks use and how much room is left, and when you last backed up.</li>
+<li><b>Protect</b>: asks the browser never to clear your plays on its own (for example when the device is low on space). Chrome, Edge and Safari usually agree automatically, especially once the app is installed.</li>
+<li><b>Export Full Playbook</b>: a .json file of the open playbook, including its roster and practice plans.</li>
 <li><b>Export Current Play</b>: just the open play, to share with another coach.</li>
 <li><b>Import</b>: open a .json file. Importing several plays into a playbook that already has plays asks whether to <b>Merge</b> or <b>Replace</b>; both can be undone from the message that appears.</li>
-<li><b>Load Starter Plays</b> and <b>Clear Playbook</b> (two clicks, undoable).</li>
-<li>The storage meter shows how much of the browser's roughly 5 MB is used.</li></ul>
+<li><b>Load Starter Plays</b> and <b>Clear Playbook</b> (two clicks, undoable).</li></ul>
 <p>If FastPlay Pro is open in two tabs, the other tab asks you to reload when one saves, so neither overwrites the other.</p>` },
+
+                    { id: 'sync', title: 'Sync Between Devices', html: `
+<h3>Sync between devices</h3>
+<p>Drive sync keeps <b>all</b> your playbooks (plays, rosters and practice plans) the same on every device where you sign in with the same Google account. They are stored in one file, <code>FastPlay Pro Sync.json</code>, in your own Google Drive. FastPlay Pro can only see that file, nothing else in your Drive, and no one else can see it.</p>
+<h4>Turning it on</h4>
+<ol><li>Open <b>Save / Load</b> and tap <b>Connect Google Drive</b>.</li>
+<li>Choose your Google account and allow access.</li>
+<li>Do the same on your other devices. Plays already on a device are combined with the ones in Drive; nothing is replaced.</li></ol>
+<h4>How it works day to day</h4>
+<ul><li>Changes sync a few seconds after you make them, when the app opens, and every couple of minutes while it's open.</li>
+<li>Tap the status at the top (<b>Synced</b>) to sync right away.</li>
+<li>Google sign-ins last about an hour. When it expires the status shows <b>Tap to sync</b>: tap it once to sign in again. Your work keeps saving on the device meanwhile.</li>
+<li>Offline? Keep working. Everything syncs when you're back online.</li>
+<li>If the <b>same play</b> was changed on two devices before they synced, both versions are kept: the other one appears as <i>"(other device)"</i> so you can pick.</li>
+<li>Deleting a play on one device deletes it everywhere.</li>
+<li><b>Disconnect</b> stops syncing on that device. Your plays stay on the device and in Drive.</li></ul>
+<div class="tip">Drive sync works when FastPlay Pro is opened from its website (or installed from it), not from a downloaded copy of the page.</div>` },
 
                     { id: 'offline', title: 'Working Offline', html: `
 <h3>Using the app without internet</h3>
-<p>The app's page needs three libraries. It looks for them in a <b>vendor</b> folder next to the page first, then falls back to the internet. To work fully offline (gym, bus, tournament), save these three files once while you have internet:</p>
-<table><tr><th>Save as</th><th>Download from</th></tr>
-<tr><td><code>vendor/tailwind.js</code></td><td>https://cdn.tailwindcss.com/3.4.17</td></tr>
-<tr><td><code>vendor/phosphor.js</code></td><td>https://unpkg.com/@phosphor-icons/web@2.1.1</td></tr>
-<tr><td><code>vendor/jspdf.umd.min.js</code></td><td>https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js</td></tr></table>
-<p>Without them offline: the layout loses its styling (tailwind), icons disappear (phosphor), and PDF buttons fall back to <b>Print</b> (jspdf). Fonts fall back to your system fonts automatically. Video, GIF, images, the Team Viewer and everything else work offline already.</p>` },
+<p>After you've opened FastPlay Pro once from its website, it keeps a copy on your device and opens and works with no internet at all: gym, bus or tournament. Your plays are always saved on the device, so nothing needs a connection except Drive sync, which catches up when you're back online.</p>
+<h4>Install it like an app</h4>
+<ul><li><b>iPhone / iPad (Safari)</b>: tap <b>Share</b>, then <b>Add to Home Screen</b>.</li>
+<li><b>Android (Chrome)</b>: tap the menu, then <b>Install app</b> (or <b>Add to Home screen</b>).</li>
+<li><b>Computer (Chrome / Edge)</b>: click the install icon in the address bar, or <b>Install</b> in Save / Load.</li></ul>
+<p>The installed app opens in its own window and keeps working offline. When an update is published, a message offers <b>Update</b>.</p>
+<h4>Running from a downloaded copy</h4>
+<p>You can also download the page with its <code>vendor</code> folder (from the project's GitHub page) and open <code>index.html</code> directly. Everything works offline that way too, except Drive sync and installing.</p>` },
 
                     { id: 'keys', title: 'Keyboard Shortcuts', html: `
 <h3>Shortcuts</h3>
@@ -6694,12 +6794,14 @@ ${act('templates', 'Open the template library')}` },
 <tr><td><kbd>Shift</kbd>+click</td><td>Add to or remove from a selection</td></tr>
 <tr><td><kbd>Space</kbd></td><td>Pause / resume while a play runs (Run in Huddle Mode)</td></tr>
 <tr><td><kbd>&larr;</kbd> <kbd>&rarr;</kbd></td><td>Jump 1 s while running; change frames in Huddle Mode</td></tr>
+<tr><td><kbd>+</kbd> / <kbd>&minus;</kbd> / <kbd>0</kbd></td><td>Zoom the court in / out / show the whole court</td></tr>
+<tr><td><kbd>Ctrl</kbd> + scroll</td><td>Zoom at the pointer (scroll alone moves around while zoomed)</td></tr>
 <tr><td><kbd>?</kbd></td><td>Open this Help Center</td></tr></table>` },
 
                     { id: 'faq', title: 'Troubleshooting & FAQ', html: `
 <h3>Common questions</h3>
 <h4>My plays aren't there on another computer.</h4>
-<p>Saved data lives in each browser separately. Export Full Playbook on the first computer and Import it on the other.</p>
+<p>Saved data lives on each device separately. Turn on <b>Google Drive sync</b> on both (Save / Load &rarr; Connect Google Drive), or Export Full Playbook on the first computer and Import it on the other.</p>
 <h4>A line doesn't follow its player.</h4>
 <p>The line's end isn't attached. Select the line and click <b>Snap Nearest</b> in the Inspector, or drag its end handle onto the player with <b>Snap</b> on. Moving a whole line by hand detaches it on purpose.</p>
 <h4>Things animate in the wrong order.</h4>
@@ -6784,7 +6886,7 @@ ${act('templates', 'Open the template library')}` },
                     { sel: ['#court-rules-select', '#mobile-court-rules'], title: 'Court options', body: 'Half or full court, hoop at top or bottom, theme, and NBA / NCAA / High School / FIBA markings.' },
                     { sel: ['#btn-huddle'], title: 'Huddle Mode', body: 'A full-screen court for timeouts with a quick chalk pen that is never saved.' },
                     { sel: ['#btn-open-playsheet'], title: 'Export', body: 'PDF PlaySheet, print, PNG / SVG images, MP4 video and GIF. Whole Playbook opens the Publisher for multi-play PDFs, call sheets, wristbands and the Team Viewer.' },
-                    { sel: ['#btn-open-storage'], title: 'Save / Load', body: 'Work saves automatically in this browser. Export .json backups regularly, import plays from other coaches, and watch your storage here.' },
+                    { sel: ['#btn-open-storage'], title: 'Save / Load', body: 'Work saves automatically on this device. Turn on Google Drive sync to have your plays on every device, export .json backups, and import plays from other coaches here.' },
                     { sel: ['#btn-help'], title: 'Help is always here', body: 'Open the Help Center (or press ?) for step-by-step instructions on everything. That\'s the tour. Go draw something!' }
                 ];
             }
@@ -7877,7 +7979,962 @@ ${act('templates', 'Open the template library')}` },
             }
         }
 
-        window.addEventListener('DOMContentLoaded', () => {
+        // =========================================================================
+        // DEVICE STORAGE: IndexedDB (no 5 MB cap) with a localStorage mirror while it fits.
+        // On start-up the newer of the two copies wins, so nothing is lost if one write didn't finish.
+        // =========================================================================
+        window.FPStore = (() => {
+            const DB = 'fastplay-pro', OS = 'kv';
+            let key = null, mem = null, dbp = null, idbOk = false, bc = null, otherTabCb = null;
+            const open = () => {
+                if (dbp) return dbp;
+                dbp = new Promise((res, rej) => {
+                    let r;
+                    try { r = indexedDB.open(DB, 1); } catch (e) { return rej(e); }
+                    r.onupgradeneeded = () => r.result.createObjectStore(OS);
+                    r.onsuccess = () => { const db = r.result; db.onversionchange = () => db.close(); res(db); };
+                    r.onerror = () => rej(r.error);
+                    r.onblocked = () => rej(new Error('IndexedDB blocked'));
+                });
+                return dbp;
+            };
+            const tx = (mode, fn) => open().then(db => new Promise((res, rej) => {
+                const t = db.transaction(OS, mode);
+                const req = fn(t.objectStore(OS));
+                t.oncomplete = () => res(req ? req.result : undefined);
+                t.onerror = t.onabort = () => rej(t.error || new Error('IndexedDB transaction failed'));
+            }));
+            const withTimeout = (p, ms) => Promise.race([p, new Promise((_, rej) => setTimeout(() => rej(new Error('IndexedDB timeout')), ms))]);
+            const stamp = raw => { try { return Date.parse(JSON.parse(raw).savedAt) || 0; } catch (_) { return -1; } };
+            return {
+                async boot(storageKey) {
+                    key = storageKey;
+                    let ls = null;
+                    try { ls = localStorage.getItem(key); } catch (_) {}
+                    let rec = null;
+                    if (typeof indexedDB !== 'undefined') {
+                        try { rec = await withTimeout(tx('readonly', s => s.get('main')), 3000); idbOk = true; }
+                        catch (e) { console.warn('IndexedDB unavailable; using localStorage only', e); dbp = null; }
+                    }
+                    const lsAt = ls ? stamp(ls) : -Infinity;
+                    if (rec && rec.raw && (rec.savedAt || 0) >= lsAt) mem = rec.raw;
+                    else {
+                        mem = ls;
+                        // First run after the upgrade (or IndexedDB fell behind): copy into IndexedDB
+                        if (ls && idbOk) tx('readwrite', s => s.put({ savedAt: lsAt, raw: ls }, 'main')).catch(() => {});
+                    }
+                    try {
+                        bc = new BroadcastChannel('fastplay-pro');
+                        bc.onmessage = e => { if (e.data === 'saved' && otherTabCb) otherTabCb(); };
+                    } catch (_) {}
+                },
+                readMain() { return mem; },
+                idbAvailable() { return idbOk; },
+                async writeMain(raw, savedAt) {
+                    mem = raw;
+                    let lsOk = false;
+                    try { localStorage.setItem(key, raw); lsOk = true; }
+                    catch (_) { try { localStorage.removeItem(key); } catch (_) {} }   // too big: drop the stale mirror
+                    let idb = false;
+                    if (idbOk) {
+                        try { await tx('readwrite', s => s.put({ savedAt, raw }, 'main')); idb = true; }
+                        catch (e) { console.warn('IndexedDB write failed', e); }
+                    }
+                    if (bc) { try { bc.postMessage('saved'); } catch (_) {} }
+                    return lsOk || idb;
+                },
+                getAux(k) { return idbOk ? tx('readonly', s => s.get(k)).catch(() => null) : Promise.resolve(null); },
+                setAux(k, v) { return idbOk ? tx('readwrite', s => s.put(v, k)).catch(() => {}) : Promise.resolve(); },
+                onOtherTabSave(cb) { otherTabCb = cb; }
+            };
+        })();
+
+        // =========================================================================
+        // GOOGLE DRIVE SYNC
+        // To turn it on, create an OAuth Client ID (see README.md) and paste it below.
+        // =========================================================================
+        const FP_DRIVE = {
+            clientId: '',
+            scope: 'https://www.googleapis.com/auth/drive.file',
+            fileName: 'FastPlay Pro Sync.json',
+            api: 'https://www.googleapis.com/drive/v3',
+            upload: 'https://www.googleapis.com/upload/drive/v3'
+        };
+
+        // Stable JSON (sorted keys) so the same data always compares equal
+        const fpCanon = (v) => {
+            if (Array.isArray(v)) return '[' + v.map(fpCanon).join(',') + ']';
+            if (v && typeof v === 'object') {
+                return '{' + Object.keys(v).sort().filter(k => v[k] !== undefined && typeof v[k] !== 'function')
+                    .map(k => JSON.stringify(k) + ':' + fpCanon(v[k])).join(',') + '}';
+            }
+            return JSON.stringify(v === undefined ? null : v);
+        };
+
+        // Three-way merge of playbooks: base = what both sides had at the last sync.
+        // A play changed on only one side takes that side's version; changed on both = keep both.
+        // Deleted on one side and untouched on the other = deleted. Nothing edited is ever dropped.
+        function fpMergeBooks(base, local, remote, newId) {
+            let conflicts = 0;
+            const byId = arr => new Map((arr || []).map(x => [x.id, x]));
+            const meta = b => fpCanon({ name: b.name, roster: b.roster, practices: b.practices });
+            const bookCanon = b => fpCanon({ m: meta(b), plays: b.plays });
+            const sameOrder = (a, b) => a.length === b.length && a.every((x, i) => x === b[i]);
+
+            const mergePlays = (p0s, pls, prs) => {
+                const P0 = byId(p0s), PL = byId(pls), PR = byId(prs);
+                const out = new Map(), copies = new Map();
+                const all = [...pls.map(p => p.id), ...prs.map(p => p.id).filter(id => !PL.has(id))];
+                all.forEach(id => {
+                    const p0 = P0.get(id), pl = PL.get(id), pr = PR.get(id);
+                    if (pl && pr) {
+                        const cl = fpCanon(pl), cr = fpCanon(pr), c0 = p0 ? fpCanon(p0) : null;
+                        if (cl === cr || c0 === cr) out.set(id, pl);
+                        else if (c0 === cl) out.set(id, pr);
+                        else {
+                            out.set(id, pl);
+                            const copy = JSON.parse(JSON.stringify(pr));
+                            copy.id = newId('play');
+                            copy.name = `${pr.name || 'Play'} (other device)`.slice(0, 120);
+                            copies.set(id, copy);
+                            conflicts++;
+                        }
+                    } else if (pl) {
+                        if (!(p0 && fpCanon(p0) === fpCanon(pl))) out.set(id, pl);    // else: deleted on the other device
+                    } else if (pr) {
+                        if (!(p0 && fpCanon(p0) === fpCanon(pr))) out.set(id, pr);    // else: deleted on this device
+                    }
+                });
+                const o0 = p0s.map(p => p.id), oL = pls.map(p => p.id), oR = prs.map(p => p.id);
+                const order = P0.size && sameOrder(oL, o0) ? oR : oL;
+                const ids = order.filter(id => out.has(id));
+                all.forEach(id => { if (out.has(id) && !ids.includes(id)) ids.push(id); });
+                const res = [];
+                ids.forEach(id => { res.push(out.get(id)); if (copies.has(id)) res.push(copies.get(id)); });
+                return res;
+            };
+
+            const pristine = b => !b.plays.length && !b.roster.length && !b.practices.length;
+            if (!base) {
+                // First sync on this device: a playbook with the same name as one in Drive is the same playbook
+                // (every device starts with its own "My Playbook"), so join them instead of listing it twice.
+                const remoteIds = new Set(remote.map(b => b.id)), taken = new Set();
+                local = local.map(bl => {
+                    if (remoteIds.has(bl.id)) return bl;
+                    const twin = remote.find(br => br.name.trim().toLowerCase() === bl.name.trim().toLowerCase() && !taken.has(br.id) && !local.some(x => x.id === br.id));
+                    if (!twin) return bl;
+                    taken.add(twin.id);
+                    return { ...bl, id: twin.id };
+                });
+            }
+            const B = byId(base), L = byId(local), R = byId(remote);
+            const books = [];
+            const ids = [...local.map(b => b.id), ...remote.map(b => b.id).filter(id => !L.has(id))];
+            ids.forEach(id => {
+                const b0 = B.get(id), bl = L.get(id), br = R.get(id);
+                if (bl && br) {
+                    const mL = meta(bl), mR = meta(br), m0 = b0 ? meta(b0) : null;
+                    let name = bl.name, roster = bl.roster, practices = bl.practices;
+                    if (mL !== mR) {
+                        if (m0 === mL) ({ name, roster, practices } = br);
+                        else if (!b0) {
+                            // Never synced before: combine instead of choosing a side
+                            if (!roster.length) roster = br.roster;
+                            else if (br.roster.length && fpCanon(roster) !== fpCanon(br.roster)) conflicts++;
+                            const have = new Set(practices.map(x => x.id));
+                            practices = [...practices, ...br.practices.filter(x => !have.has(x.id))];
+                        } else if (m0 !== mR) conflicts++;    // name/roster/practices edited on both: this device's version wins
+                    }
+                    books.push({ id, name, roster, practices, currentPlayId: bl.currentPlayId,
+                        plays: mergePlays(b0 ? b0.plays : [], bl.plays, br.plays) });
+                } else if (bl) {
+                    if (b0 && bookCanon(b0) === bookCanon(bl)) return;              // deleted on the other device
+                    if (!base && pristine(bl) && remote.length) return;              // empty starter book on a new device
+                    books.push(bl);
+                } else if (br) {
+                    if (b0 && bookCanon(b0) === bookCanon(br)) return;              // deleted on this device
+                    books.push({ ...br, currentPlayId: null });
+                }
+            });
+            return { books, conflicts };
+        }
+        window.fpMergeBooks = fpMergeBooks;
+
+        const FP_PILL_TONES = {
+            emerald: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20',
+            sky: 'text-sky-300 bg-sky-500/10 border-sky-500/30',
+            amber: 'text-amber-300 bg-amber-500/10 border-amber-500/40',
+            red: 'text-red-300 bg-red-500/10 border-red-500/40',
+            slate: 'text-slate-300 bg-slate-500/10 border-slate-500/30'
+        };
+
+        Object.assign(FastPlayStudio.prototype, {
+
+            initExtensions() {
+                this.loadSyncState();
+                this.bindExtensionUI();
+                this.setupCourtZoom();
+                window.addEventListener('resize', () => this.renderStatusPill());
+                this.registerServiceWorker();
+                this.setupInstallPrompt();
+                this.maybeProtectStorage();
+                this.renderStatusPill();
+                if (this.syncState.enabled) {
+                    if (this.driveConfigured() && navigator.onLine) this.loadGIS().catch(() => {});
+                    if (this.driveTokenValid()) this.queueSync(800); else this.setSyncStatus('needs-auth');
+                }
+                // Pick up edits made on other devices while the app stays open
+                setInterval(() => {
+                    if (document.visibilityState === 'visible' && this.syncState.enabled && this.driveTokenValid()) this.driveSync();
+                }, 90000);
+                document.addEventListener('visibilitychange', () => {
+                    if (document.visibilityState === 'visible' && this.syncState.enabled) this.queueSync(600);
+                });
+                window.addEventListener('online', () => { if (this.syncState.enabled) this.queueSync(600); });
+                window.addEventListener('offline', () => { if (this.syncState.enabled) this.setSyncStatus('offline'); });
+                setTimeout(() => this.maybeRemindBackup(), 5000);
+            },
+
+            bindExtensionUI() {
+                const on = (id, fn) => document.getElementById(id)?.addEventListener('click', fn);
+                on('btn-drive-connect', () => this.driveConnect());
+                on('btn-drive-sync-now', () => this.driveSyncNowClicked());
+                on('btn-drive-disconnect', () => this.driveDisconnect());
+                on('btn-storage-persist', () => this.requestPersist(true));
+                on('btn-install-app', () => this.promptInstall());
+                ['top-save-pill', 'mobile-save-pill'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (!el) return;
+                    el.setAttribute('role', 'button');
+                    el.setAttribute('tabindex', '0');
+                    el.classList.add('cursor-pointer');
+                    el.addEventListener('click', () => this.onStatusPillClick());
+                    el.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); this.onStatusPillClick(); } });
+                });
+            },
+
+            // ---------------- Status pill (top bar) ----------------
+            onStatusPillClick() {
+                const st = this.syncState;
+                if (st.enabled && this.driveConfigured()) {
+                    if (!this.driveTokenValid()) return this.driveAuthorize('');
+                    this.driveSync({ manual: true });
+                    return;
+                }
+                this.openStorageModal();
+            },
+
+            renderStatusPill() {
+                const loc = this.localSaveState || 'saved';
+                const st = this.syncState || {};
+                const sync = st.enabled ? (this.syncStatus || 'idle') : null;
+                let text = 'Saved', mtext = 'Saved', icon = 'ph-check-circle', tone = 'emerald';
+                let title = 'Saved on this device. Tap for storage, backups and sync.';
+                if (loc === 'error') { text = 'Save Error'; mtext = 'Error'; icon = 'ph-warning-circle'; tone = 'red'; title = 'Could not save on this device. Export a .json backup.'; }
+                else if (loc === 'saving') { text = mtext = 'Saving...'; icon = 'ph-circle-notch'; }
+                else if (sync) {
+                    const last = st.lastSyncAt ? `Last synced ${new Date(st.lastSyncAt).toLocaleString([], { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}.` : 'Not synced yet.';
+                    if (sync === 'syncing') { text = mtext = 'Syncing...'; icon = 'ph-cloud-arrow-up'; tone = 'sky'; title = 'Syncing with Google Drive...'; }
+                    else if (sync === 'synced') { text = mtext = 'Synced'; icon = 'ph-cloud-check'; title = `Saved and synced with Google Drive. ${last} Tap to sync now.`; }
+                    else if (sync === 'needs-auth') { text = 'Tap to sync'; mtext = 'Sync'; icon = 'ph-cloud-warning'; tone = 'amber'; title = `Saved on this device. Tap to sign in to Google and sync. ${last}`; }
+                    else if (sync === 'offline') { text = mtext = 'Offline'; icon = 'ph-cloud-slash'; tone = 'slate'; title = `Saved on this device. Will sync when you're back online. ${last}`; }
+                    else if (sync === 'error') { text = 'Sync error'; mtext = 'Retry'; icon = 'ph-cloud-warning'; tone = 'red'; title = `Saved on this device, but syncing failed. Tap to retry. ${last}`; }
+                    else { icon = 'ph-cloud'; title = `Saved on this device. ${last} Tap to sync now.`; }
+                }
+                if (window.innerWidth < 1900) text = mtext;   // the header is tight below very wide screens
+                [['top-save-pill', 'top-save-status-text', text], ['mobile-save-pill', 'mobile-save-status-text', mtext]].forEach(([pid, tid, t]) => {
+                    const pill = document.getElementById(pid), label = document.getElementById(tid);
+                    if (label) label.textContent = t;
+                    if (!pill) return;
+                    Object.values(FP_PILL_TONES).forEach(c => pill.classList.remove(...c.split(' ')));
+                    pill.classList.add(...FP_PILL_TONES[tone].split(' '));
+                    pill.title = title;
+                    pill.setAttribute('aria-label', title);
+                    const i = pill.querySelector('i');
+                    if (i) i.className = `ph-fill ${icon}`;
+                });
+            },
+
+            // ---------------- Sync state ----------------
+            loadSyncState() {
+                let st = {};
+                try { st = JSON.parse(localStorage.getItem(this.STORAGE_KEY + '_sync') || '{}') || {}; } catch (_) {}
+                this.syncState = { enabled: !!st.enabled, email: st.email || '', token: st.token || null, tokenExp: st.tokenExp || 0, lastSyncAt: st.lastSyncAt || 0 };
+                this.syncStatus = 'idle';
+            },
+            saveSyncState() {
+                try { localStorage.setItem(this.STORAGE_KEY + '_sync', JSON.stringify(this.syncState)); } catch (_) {}
+            },
+            setSyncStatus(s) {
+                // On phones the status pill sits off-screen in the scrolling bar, so say it once per visit
+                if (s === 'needs-auth' && this.syncStatus !== 'needs-auth' && !this._authNudged && window.innerWidth < 1280) {
+                    this._authNudged = true;
+                    setTimeout(() => {
+                        if (this.syncStatus === 'needs-auth' && !this.getOpenModal()) {
+                            this.showToast('Sign in to Google to sync your plays', 'info', 'Sign in', () => this.driveAuthorize(''), 10000);
+                        }
+                    }, 1500);
+                }
+                this.syncStatus = s;
+                this.renderStatusPill();
+                this.renderSyncCard();
+            },
+            driveClientId() {
+                let override = '';
+                try { override = localStorage.getItem('fastplay_google_client_id') || ''; } catch (_) {}
+                return (override || FP_DRIVE.clientId || '').trim();
+            },
+            driveConfigured() { return !!this.driveClientId() && /^https?:$/.test(location.protocol); },
+            driveTokenValid() { return !!this.syncState.token && Date.now() < this.syncState.tokenExp; },
+
+            afterLocalSave() {
+                if (this.syncState && this.syncState.enabled) {
+                    if (this.driveTokenValid()) this.queueSync(8000);
+                    else if (this.syncStatus !== 'needs-auth' && this.syncStatus !== 'offline') this.setSyncStatus(navigator.onLine ? 'needs-auth' : 'offline');
+                }
+            },
+            queueSync(ms) {
+                if (this._syncTimer) clearTimeout(this._syncTimer);
+                this._syncTimer = setTimeout(() => { this._syncTimer = null; this.driveSync(); }, ms);
+            },
+
+            // ---------------- Google sign-in (token only, nothing stored on a server) ----------------
+            loadGIS() {
+                if (window.google && window.google.accounts && window.google.accounts.oauth2) return Promise.resolve();
+                if (this._gisP) return this._gisP;
+                this._gisP = new Promise((res, rej) => {
+                    const s = document.createElement('script');
+                    s.src = 'https://accounts.google.com/gsi/client';
+                    s.async = true;
+                    s.onload = () => res();
+                    s.onerror = () => { this._gisP = null; s.remove(); rej(new Error('Could not load Google sign-in')); };
+                    document.head.appendChild(s);
+                });
+                return this._gisP;
+            },
+
+            driveConnect() {
+                if (location.protocol === 'file:') return this.showToast('Open FastPlay Pro from its website to use Drive sync', 'info', null, null, 4500);
+                if (!this.driveClientId()) return this.showToast('Drive sync needs a one-time setup first (see Help)', 'info', 'Help', () => { this.closeStorageModal(); this.openHelp('sync'); }, 6000);
+                if (!navigator.onLine) return this.showToast('You are offline. Connect to the internet to set up sync.', 'info');
+                this.driveAuthorize(this.syncState.email ? '' : 'consent');
+            },
+
+            // Must run from a tap/click so the Google window is allowed to open
+            driveAuthorize(prompt) {
+                const oauth2 = window.google && window.google.accounts && window.google.accounts.oauth2;
+                if (!oauth2) {
+                    this.showToast('Loading Google sign-in...', 'info');
+                    this.loadGIS().then(() => this.showToast('Google sign-in is ready', 'info', 'Continue', () => this.driveAuthorize(prompt), 10000))
+                        .catch(() => this.showToast('Could not reach Google. Check your connection.', 'error'));
+                    return;
+                }
+                if (!this._tokenClient || this._tokenClientId !== this.driveClientId()) {
+                    this._tokenClientId = this.driveClientId();
+                    this._tokenClient = oauth2.initTokenClient({
+                        client_id: this._tokenClientId,
+                        scope: FP_DRIVE.scope,
+                        callback: (resp) => this.onDriveToken(resp),
+                        error_callback: (err) => {
+                            if (err && err.type === 'popup_failed_to_open') this.showToast('Allow pop-ups for this site to sign in to Google', 'error', null, null, 5000);
+                            if (this.syncState.enabled) this.setSyncStatus('needs-auth');
+                        }
+                    });
+                }
+                const opts = { prompt };
+                if (this.syncState.email) opts.login_hint = this.syncState.email;
+                this._tokenClient.requestAccessToken(opts);
+            },
+
+            async onDriveToken(resp) {
+                if (!resp || resp.error) {
+                    if (this.syncState.enabled) this.setSyncStatus('needs-auth');
+                    if (resp && resp.error !== 'access_denied') this.showToast('Google sign-in failed', 'error');
+                    return;
+                }
+                const oauth2 = window.google.accounts.oauth2;
+                if (oauth2.hasGrantedAllScopes && !oauth2.hasGrantedAllScopes(resp, FP_DRIVE.scope)) {
+                    this.showToast('Sync needs permission to save its file in your Google Drive', 'error', null, null, 6000);
+                    return;
+                }
+                const first = !this.syncState.enabled;
+                Object.assign(this.syncState, { enabled: true, token: resp.access_token, tokenExp: Date.now() + Math.max(60, (Number(resp.expires_in) || 3600) - 120) * 1000 });
+                this.saveSyncState();
+                try {
+                    const r = await this.driveFetch(`${FP_DRIVE.api}/about?fields=user(emailAddress)`);
+                    const j = await r.json();
+                    if (j && j.user && j.user.emailAddress) { this.syncState.email = j.user.emailAddress; this.saveSyncState(); }
+                } catch (_) {}
+                await this.driveSync({ manual: !first, first });
+            },
+
+            driveSyncNowClicked() {
+                if (!this.driveTokenValid()) return this.driveAuthorize('');
+                this.driveSync({ manual: true });
+            },
+
+            driveDisconnect() {
+                const token = this.syncState.token;
+                try { if (token && window.google && window.google.accounts) window.google.accounts.oauth2.revoke(token, () => {}); } catch (_) {}
+                this.syncState = { enabled: false, email: '', token: null, tokenExp: 0, lastSyncAt: 0 };
+                this.saveSyncState();
+                window.FPStore.setAux('syncBase', null);
+                this.setSyncStatus('idle');
+                this.showToast('Drive sync turned off. Your plays stay on this device and in your Drive file.', 'info', null, null, 5000);
+            },
+
+            // ---------------- Drive REST ----------------
+            async driveFetch(url, opts = {}) {
+                const r = await fetch(url, { ...opts, headers: { ...(opts.headers || {}), Authorization: `Bearer ${this.syncState.token}` } });
+                if (r.status === 401) {
+                    this.syncState.token = null; this.syncState.tokenExp = 0; this.saveSyncState();
+                    const e = new Error('Google sign-in expired'); e.status = 401; throw e;
+                }
+                if (!r.ok) {
+                    let detail = '';
+                    try { detail = (await r.json()).error.message; } catch (_) {}
+                    const e = new Error(`Google Drive error ${r.status}${detail ? ': ' + detail : ''}`); e.status = r.status; throw e;
+                }
+                return r;
+            },
+            async driveFindFile() {
+                const q = encodeURIComponent(`name='${FP_DRIVE.fileName}' and trashed=false`);
+                const r = await this.driveFetch(`${FP_DRIVE.api}/files?q=${q}&spaces=drive&orderBy=modifiedTime%20desc&pageSize=10&fields=files(id,modifiedTime)`);
+                const j = await r.json();
+                return (j.files && j.files[0]) || null;
+            },
+            async driveDownload(id) {
+                const r = await this.driveFetch(`${FP_DRIVE.api}/files/${encodeURIComponent(id)}?alt=media`);
+                return r.text();
+            },
+            async driveUpload(fileId, text) {
+                if (fileId) {
+                    const r = await this.driveFetch(`${FP_DRIVE.upload}/files/${encodeURIComponent(fileId)}?uploadType=media&fields=id,modifiedTime`,
+                        { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: text });
+                    return r.json();
+                }
+                const b = 'fastplay' + Math.random().toString(36).slice(2);
+                const meta = { name: FP_DRIVE.fileName, mimeType: 'application/json', description: 'FastPlay Pro playbooks, synced by the app. Edit plays in the app, not here.' };
+                const body = `--${b}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${JSON.stringify(meta)}\r\n--${b}\r\nContent-Type: application/json\r\n\r\n${text}\r\n--${b}--`;
+                const r = await this.driveFetch(`${FP_DRIVE.upload}/files?uploadType=multipart&fields=id,modifiedTime`,
+                    { method: 'POST', headers: { 'Content-Type': `multipart/related; boundary=${b}` }, body });
+                return r.json();
+            },
+
+            // Same validation as loading from disk, so all three sides of a merge look alike
+            normalizeBooksForSync(books) {
+                const res = this.booksFromSaved(JSON.parse(JSON.stringify({ books })));
+                return res.books;
+            },
+            booksForCompare(books) { return fpCanon(books.map(b => ({ ...b, currentPlayId: null }))); },
+
+            // ---------------- The sync itself ----------------
+            async driveSync(opts = {}) {
+                const st = this.syncState;
+                if (!st || !st.enabled || !this.driveConfigured()) return;
+                if (this._syncing) { this._syncAgain = true; return; }
+                if (!navigator.onLine) return this.setSyncStatus('offline');
+                if (!this.driveTokenValid()) {
+                    this.setSyncStatus('needs-auth');
+                    if (opts.manual) this.driveAuthorize('');
+                    return;
+                }
+                // Never swap data out from under a drag or a running animation
+                if (this.dragState || (this.animState && this.animState.running)) {
+                    return this.queueSync(4000);
+                }
+                this._syncing = true;
+                this.setSyncStatus('syncing');
+                try {
+                    if (this.saveTimer) { clearTimeout(this.saveTimer); this.saveTimer = null; }
+                    if (this.dirty) this.saveToLocalStorage();
+
+                    const file = await this.driveFindFile();
+                    const baseRec = await window.FPStore.getAux('syncBase');
+                    const base = baseRec && file && baseRec.fileId === file.id ? baseRec : null;
+                    let remote = null;
+                    if (file) {
+                        if (base && base.modifiedTime === file.modifiedTime) remote = base.books;   // nothing new on Drive
+                        else {
+                            const txt = await this.driveDownload(file.id);
+                            let parsed = null;
+                            try { parsed = JSON.parse(txt); } catch (_) {}
+                            if (!parsed) throw new Error('The sync file in Google Drive is damaged. Delete "' + FP_DRIVE.fileName + '" in Drive to start fresh.');
+                            remote = this.booksFromSaved(parsed).books;
+                        }
+                    }
+                    if (this.dragState) { this._syncAgain = true; return; }
+
+                    // From here to applying the result is synchronous: no edits can sneak in between
+                    const local = this.normalizeBooksForSync(this.books);
+                    let merged = local, conflicts = 0;
+                    if (remote) ({ books: merged, conflicts } = fpMergeBooks(base ? base.books : null, local, remote, p => this.uid(p)));
+                    if (!merged.length) merged = [this.newBook('My Playbook')];
+                    merged = this.normalizeBooksForSync(merged);
+                    const mergedKey = this.booksForCompare(merged);
+                    const changedHere = mergedKey !== this.booksForCompare(local);
+                    if (changedHere) this.applySyncedBooks(merged, local);
+
+                    let fileMeta = file;
+                    if (!remote || mergedKey !== this.booksForCompare(remote)) {
+                        const payload = JSON.stringify({ app: 'FastPlay Pro', version: 4, savedAt: new Date().toISOString(), books: merged });
+                        fileMeta = await this.driveUpload(file && file.id, payload);
+                    }
+                    await window.FPStore.setAux('syncBase', { fileId: fileMeta.id, modifiedTime: fileMeta.modifiedTime, books: merged });
+                    st.lastSyncAt = Date.now();
+                    this.saveSyncState();
+                    this.setSyncStatus('synced');
+                    if (conflicts) this.showToast(`${conflicts} play${conflicts === 1 ? ' was' : 's were'} changed on two devices. Both versions were kept ("other device").`, 'info', null, null, 7000);
+                    else if (opts.first) this.showToast(changedHere ? 'Drive sync is on. Plays from your other devices were added.' : 'Drive sync is on. Your plays are now in your Google Drive.', 'success', null, null, 4500);
+                    else if (opts.manual) this.showToast(changedHere ? 'Synced: updates from your other devices are in' : 'Synced with Google Drive');
+                    if (this.updateStorageMeter) this.updateStorageMeter();
+                } catch (err) {
+                    console.warn('Drive sync failed:', err);
+                    if (err.status === 401) { this.setSyncStatus('needs-auth'); if (opts.manual) this.showToast('Google sign-in expired. Tap the sync button to sign in again.', 'info', null, null, 5000); }
+                    else if (!navigator.onLine) this.setSyncStatus('offline');
+                    else {
+                        this.setSyncStatus('error');
+                        if (opts.manual || opts.first) this.showToast(err.message || 'Sync failed', 'error', null, null, 6000);
+                    }
+                } finally {
+                    this._syncing = false;
+                    if (this._syncAgain) { this._syncAgain = false; this.queueSync(1500); }
+                }
+            },
+
+            applySyncedBooks(merged, localNormalized) {
+                const oldPlays = new Map();
+                localNormalized.forEach(b => b.plays.forEach(p => oldPlays.set(p.id, fpCanon(p))));
+                merged.forEach(b => {
+                    const lb = this.books.find(x => x.id === b.id) || this.books.find(x => x.plays.some(p => p.id === (b.plays[0] && b.plays[0].id)));
+                    b.currentPlayId = lb ? lb.currentPlayId : null;
+                });
+                const prevPlay = this.currentPlayId, prevFrame = this.currentFrameIndex;
+                const prevPlayKey = oldPlays.get(prevPlay);
+                this.books = merged;
+                if (!this.currentBook()) {
+                    // The open playbook may have been joined with its twin from Drive: follow the open play
+                    const home = merged.find(b => b.plays.some(p => p.id === prevPlay)) || merged[0];
+                    this.currentBookId = home.id;
+                }
+                const book = this.currentBook();
+                const cur = book.plays.find(p => p.id === prevPlay) || book.plays.find(p => p.id === book.currentPlayId) || book.plays[0] || null;
+                this.currentPlayId = cur ? cur.id : null;
+                if (cur) {
+                    this.courtType = cur.courtType; this.courtTheme = cur.courtTheme;
+                    this.currentFrameIndex = Math.max(0, Math.min(cur.id === prevPlay ? prevFrame : 0, cur.frames.length - 1));
+                } else this.currentFrameIndex = 0;
+                // Undo history for plays that changed elsewhere no longer applies
+                merged.forEach(b => b.plays.forEach(p => { if (oldPlays.has(p.id) && oldPlays.get(p.id) !== fpCanon(p)) this.historyMap.delete(p.id); }));
+                if (!cur || cur.id !== prevPlay || fpCanon(cur) !== prevPlayKey) this.selectedElement = null;
+                this.saveToLocalStorage();
+                this.syncAllUI();
+                this.resizeCourtCanvas();
+                this.renderCourt();
+                if (this.updateUndoRedoButtons) this.updateUndoRedoButtons();
+            },
+
+            // ---------------- Storage modal pieces ----------------
+            renderSyncCard() {
+                const badge = document.getElementById('drive-sync-badge'), text = document.getElementById('drive-sync-text');
+                const bConnect = document.getElementById('btn-drive-connect'), bNow = document.getElementById('btn-drive-sync-now'), bOff = document.getElementById('btn-drive-disconnect');
+                if (!badge || !text) return;
+                const st = this.syncState || {};
+                const setBadge = (label, cls) => { badge.textContent = label; badge.className = `text-[10px] font-mono uppercase px-1.5 py-0.5 rounded border ${cls}`; };
+                const show = (el, v) => el && el.classList.toggle('hidden', !v);
+                if (location.protocol === 'file:') {
+                    setBadge('Off', 'border-slate-700 text-slate-400');
+                    text.textContent = 'Drive sync works when FastPlay Pro is opened from its website, not from a saved file.';
+                    show(bConnect, false); show(bNow, false); show(bOff, false);
+                    return;
+                }
+                if (!this.driveClientId()) {
+                    setBadge('Setup needed', 'border-slate-700 text-slate-400');
+                    text.textContent = 'Keep your playbooks in sync across phone, tablet and computer through your own Google Drive. The site owner has to finish a one-time Google setup first (see Help → Sync between devices).';
+                    show(bConnect, false); show(bNow, false); show(bOff, false);
+                    return;
+                }
+                if (!st.enabled) {
+                    setBadge('Off', 'border-slate-700 text-slate-400');
+                    text.textContent = 'Keep every playbook in sync across your phone, tablet and computer. Your plays are saved to one file in your own Google Drive; nobody else can see it.';
+                    show(bConnect, true); show(bNow, false); show(bOff, false);
+                    return;
+                }
+                const last = st.lastSyncAt ? new Date(st.lastSyncAt).toLocaleString([], { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }) : 'not yet';
+                const s = this.syncStatus;
+                if (s === 'needs-auth') setBadge('Sign in', 'border-amber-500/40 text-amber-300');
+                else if (s === 'error') setBadge('Error', 'border-red-500/40 text-red-300');
+                else if (s === 'offline') setBadge('Offline', 'border-slate-600 text-slate-300');
+                else if (s === 'syncing') setBadge('Syncing', 'border-sky-500/40 text-sky-300');
+                else setBadge('On', 'border-emerald-500/40 text-emerald-300');
+                text.textContent = `Connected${st.email ? ' as ' + st.email : ''}. Last synced: ${last}.` +
+                    (s === 'needs-auth' ? ' Google sign-ins last about an hour; tap Sync Now to sign in again.' : '');
+                if (bNow) bNow.textContent = s === 'needs-auth' ? 'Sign in & Sync' : 'Sync Now';
+                show(bConnect, false); show(bNow, true); show(bOff, true);
+            },
+
+            updateStorageMeter() {
+                const raw = (window.FPStore && window.FPStore.readMain()) || '';
+                const bytes = new Blob([raw]).size;
+                const fmt = b => b < 1024 * 1024 ? `${Math.max(1, Math.round(b / 1024))} KB` : b < 1024 ** 3 ? `${(b / 1024 / 1024).toFixed(1)} MB` : `${(b / 1024 ** 3).toFixed(1)} GB`;
+                const txt = document.getElementById('storage-usage-text');
+                const bar = document.getElementById('storage-usage-bar');
+                const allPlays = this.books.reduce((n, b) => n + b.plays.length, 0);
+                const counts = `${allPlays} play${allPlays === 1 ? '' : 's'} in ${this.books.length} playbook${this.books.length === 1 ? '' : 's'}`;
+                const paint = (pct, label) => {
+                    if (txt) txt.textContent = label;
+                    if (!bar) return;
+                    bar.style.width = `${Math.max(pct, bytes ? 1 : 0)}%`;
+                    bar.classList.toggle('bg-emerald-500', pct < 60);
+                    bar.classList.toggle('bg-amber-500', pct >= 60 && pct < 85);
+                    bar.classList.toggle('bg-red-500', pct >= 85);
+                };
+                const idb = window.FPStore && window.FPStore.idbAvailable();
+                if (!idb) paint(Math.min(100, (bytes * 2 / (5 * 1024 * 1024)) * 100), `${fmt(bytes * 2)} / ~5 MB — ${counts}`);
+                else {
+                    paint(0, `${fmt(bytes)} — ${counts}`);
+                    if (navigator.storage && navigator.storage.estimate) {
+                        navigator.storage.estimate().then(({ usage, quota }) => {
+                            if (!quota) return;
+                            paint(Math.min(100, (usage / quota) * 100), `${fmt(bytes)} — ${counts} · ${fmt(Math.max(0, quota - usage))} free`);
+                        }).catch(() => {});
+                    }
+                }
+                const bk = document.getElementById('storage-backup-text');
+                if (bk) {
+                    let lastExport = 0;
+                    try { lastExport = Date.parse(localStorage.getItem(this.STORAGE_KEY + '_lastExport') || '') || 0; } catch (_) {}
+                    const lastSync = (this.syncState && this.syncState.enabled && this.syncState.lastSyncAt) || 0;
+                    const t = Math.max(lastExport, lastSync);
+                    const days = t ? Math.floor((Date.now() - t) / 86400000) : null;
+                    const stale = !t || days >= 7;
+                    const how = t === lastSync && lastSync ? 'synced to Google Drive' : '.json export';
+                    const d = t ? new Date(t) : null;
+                    bk.textContent = d
+                        ? `Last backup: ${d.toLocaleDateString()} ${d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })} (${how})${stale ? ` — ${days} days ago, time for a fresh one` : ''}`
+                        : (allPlays ? 'Last backup: never — turn on Drive sync or export a .json backup' : 'Last backup: never');
+                    bk.classList.toggle('text-amber-300', stale && allPlays > 0);
+                    bk.classList.toggle('text-slate-400', !(stale && allPlays > 0));
+                }
+                this.renderPersistStatus();
+            },
+
+            // ---------------- Keep the browser from clearing saved plays ----------------
+            maybeProtectStorage() {
+                // Chrome, Edge and Safari decide silently; Firefox shows a prompt, so there it waits for the Protect button
+                const silent = !/firefox/i.test(navigator.userAgent);
+                const hasPlays = this.books.some(b => b.plays.length);
+                if (silent && hasPlays) this.requestPersist(false);
+            },
+            async requestPersist(fromClick) {
+                if (!(navigator.storage && navigator.storage.persist)) return;
+                try {
+                    if (await navigator.storage.persisted()) { this.renderPersistStatus(); return; }
+                    const ok = await navigator.storage.persist();
+                    if (fromClick) this.showToast(ok ? 'Protected: the browser won’t clear your plays on its own' : 'The browser declined. Installing the app or turning on Drive sync keeps your plays safe.', ok ? 'success' : 'info', null, null, 5000);
+                } catch (_) {}
+                this.renderPersistStatus();
+            },
+            async renderPersistStatus() {
+                const t = document.getElementById('storage-persist-text'), b = document.getElementById('btn-storage-persist');
+                if (!t) return;
+                if (!(navigator.storage && navigator.storage.persisted)) { t.textContent = ''; b && b.classList.add('hidden'); return; }
+                let p = false;
+                try { p = await navigator.storage.persisted(); } catch (_) {}
+                t.textContent = p ? 'Protected: the browser won’t clear this data on its own.' : 'Not protected: the browser may clear it when space is low or after weeks unused.';
+                t.className = p ? 'text-emerald-300' : 'text-slate-400';
+                if (b) b.classList.toggle('hidden', p);
+            },
+
+            maybeRemindBackup() {
+                if (this.getOpenModal() || this.tour) return;
+                const plays = this.books.reduce((n, b) => n + b.plays.length, 0);
+                if (plays < 3) return;
+                const st = this.syncState || {};
+                if (st.enabled && st.lastSyncAt && Date.now() - st.lastSyncAt < 7 * 86400000) return;
+                let pr = {}, lastExport = 0;
+                try { pr = JSON.parse(localStorage.getItem(this.STORAGE_KEY + '_prefs') || '{}'); } catch (_) {}
+                try { lastExport = Date.parse(localStorage.getItem(this.STORAGE_KEY + '_lastExport') || '') || 0; } catch (_) {}
+                if (lastExport && Date.now() - lastExport < 7 * 86400000) return;
+                if (pr.backupNagAt && Date.now() - pr.backupNagAt < 3 * 86400000) return;
+                this.savePrefs({ backupNagAt: Date.now() });
+                const msg = st.enabled ? 'Your plays haven’t synced in over a week' : (lastExport ? 'Your last backup is over a week old' : `You have ${plays} plays and no backup yet`);
+                this.showToast(msg, 'info', st.enabled ? 'Sync' : 'Back up', () => st.enabled ? this.driveSyncNowClicked() : this.openStorageModal(), 10000);
+            },
+
+            // ---------------- Offline app (service worker) & install ----------------
+            registerServiceWorker() {
+                if (!('serviceWorker' in navigator) || !/^https?:$/.test(location.protocol)) return;
+                navigator.serviceWorker.register('sw.js').then(reg => {
+                    const offer = (w) => {
+                        if (!w || !navigator.serviceWorker.controller) return;   // first install: nothing to update
+                        this.showToast('A new version of FastPlay Pro is ready', 'info', 'Update', () => {
+                            if (this.saveTimer) { clearTimeout(this.saveTimer); this.saveTimer = null; }
+                            if (this.dirty) this.saveToLocalStorage();
+                            this._reloadOnUpdate = true;
+                            w.postMessage('skipWaiting');
+                        }, 30000);
+                    };
+                    if (reg.waiting) offer(reg.waiting);
+                    reg.addEventListener('updatefound', () => {
+                        const w = reg.installing;
+                        if (w) w.addEventListener('statechange', () => { if (w.state === 'installed') offer(w); });
+                    });
+                    // Look for updates when the app comes back to the foreground
+                    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') reg.update().catch(() => {}); });
+                }).catch(err => console.warn('Service worker registration failed', err));
+                navigator.serviceWorker.addEventListener('controllerchange', () => { if (this._reloadOnUpdate) location.reload(); });
+            },
+
+            setupInstallPrompt() {
+                const card = document.getElementById('install-card'), btn = document.getElementById('btn-install-app'), text = document.getElementById('install-text');
+                const standalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+                if (standalone || !card) return;
+                const ios = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+                if (ios && /^https?:$/.test(location.protocol)) {
+                    card.classList.remove('hidden');
+                    if (text) text.textContent = 'On iPhone or iPad: tap the Share button in Safari, then "Add to Home Screen". It opens like an app, works without internet, and Safari won’t clear its data.';
+                }
+                window.addEventListener('beforeinstallprompt', (e) => {
+                    e.preventDefault();
+                    this._installEvt = e;
+                    card.classList.remove('hidden');
+                    btn && btn.classList.remove('hidden');
+                });
+                window.addEventListener('appinstalled', () => {
+                    this._installEvt = null;
+                    card.classList.add('hidden');
+                    this.showToast('FastPlay Pro is installed');
+                });
+            },
+            async promptInstall() {
+                const e = this._installEvt;
+                if (!e) return;
+                this._installEvt = null;
+                e.prompt();
+                try { await e.userChoice; } catch (_) {}
+                document.getElementById('btn-install-app')?.classList.add('hidden');
+            }
+        });
+
+        // Refresh the sync / install cards whenever Save / Load opens
+        (() => {
+            const open = FastPlayStudio.prototype.openStorageModal;
+            FastPlayStudio.prototype.openStorageModal = function (...args) {
+                const r = open.apply(this, args);
+                // Load Google sign-in ahead of time so "Connect" opens the Google window on the first tap
+                if (this.driveConfigured() && navigator.onLine) this.loadGIS().catch(() => {});
+                this.renderSyncCard();
+                this.updateStorageMeter();
+                return r;
+            };
+        })();
+
+
+        // =========================================================================
+        // COURT ZOOM & PAN: two-finger pinch/drag, Ctrl/trackpad pinch, scroll to pan, middle-drag, + / - / 0 keys
+        // =========================================================================
+        Object.assign(FastPlayStudio.prototype, {
+            ZOOM_MAX: 4,
+
+            courtViewBox() {
+                const W = 500, H = this.courtType === 'full' ? 940 : 470;
+                const zm = this.zoom || { z: 1 };
+                if (!(zm.z > 1)) return { x: 0, y: 0, w: W, h: H };
+                const w = W / zm.z, h = H / zm.z;
+                return { x: this.clamp(zm.x, 0, W - w), y: this.clamp(zm.y, 0, H - h), w, h };
+            },
+
+            applyCourtZoom() {
+                const svg = document.getElementById('basketball-court');
+                if (!svg) return;
+                if (!this.zoom) this.zoom = { z: 1, x: 0, y: 0 };
+                if (this.zoom.type && this.zoom.type !== this.courtType) this.zoom = { z: 1, x: 0, y: 0 };   // half <-> full court
+                this.zoom.type = this.courtType;
+                const vb = this.courtViewBox();
+                this.zoom.x = vb.x; this.zoom.y = vb.y;
+                svg.setAttribute('viewBox', `${+vb.x.toFixed(2)} ${+vb.y.toFixed(2)} ${+vb.w.toFixed(2)} ${+vb.h.toFixed(2)}`);
+                const z = this.zoom.z;
+                const label = document.getElementById('btn-zoom-reset');
+                if (label) label.textContent = `${Math.round(z * 100)}%`;
+                const out = document.getElementById('btn-zoom-out'), inn = document.getElementById('btn-zoom-in');
+                if (out) out.disabled = z <= 1.001;
+                if (inn) inn.disabled = z >= this.ZOOM_MAX - 0.001;
+            },
+
+            // Zoom to level z, keeping the court point under (clientX, clientY) in place
+            zoomCourtTo(z, clientX, clientY) {
+                const svg = document.getElementById('basketball-court');
+                if (!svg) return;
+                const rect = svg.getBoundingClientRect();
+                if (clientX === undefined) { clientX = rect.left + rect.width / 2; clientY = rect.top + rect.height / 2; }
+                const vb = this.courtViewBox();
+                const fx = this.clamp((clientX - rect.left) / (rect.width || 1), 0, 1), fy = this.clamp((clientY - rect.top) / (rect.height || 1), 0, 1);
+                const px = vb.x + fx * vb.w, py = vb.y + fy * vb.h;
+                z = this.clamp(z, 1, this.ZOOM_MAX);
+                if (z < 1.02) z = 1;
+                const W = 500, H = this.courtType === 'full' ? 940 : 470;
+                this.zoom = { z, x: px - fx * (W / z), y: py - fy * (H / z), type: this.courtType };
+                this.applyCourtZoom();
+            },
+
+            panCourtBy(dxPx, dyPx) {
+                const svg = document.getElementById('basketball-court');
+                if (!svg || !(this.zoom && this.zoom.z > 1)) return;
+                const rect = svg.getBoundingClientRect(), vb = this.courtViewBox();
+                this.zoom.x = vb.x + (dxPx / (rect.width || 1)) * vb.w;
+                this.zoom.y = vb.y + (dyPx / (rect.height || 1)) * vb.h;
+                this.applyCourtZoom();
+            },
+
+            setupCourtZoom() {
+                const stage = document.getElementById('court-stage'), svg = document.getElementById('basketball-court');
+                if (!stage || !svg) return;
+                if (!this.zoom) this.zoom = { z: 1, x: 0, y: 0 };
+                const on = (id, fn) => document.getElementById(id)?.addEventListener('click', fn);
+                on('btn-zoom-in', () => this.zoomCourtTo(this.zoom.z * 1.5));
+                on('btn-zoom-out', () => this.zoomCourtTo(this.zoom.z / 1.5));
+                on('btn-zoom-reset', () => this.zoomCourtTo(1));
+
+                const touches = new Map();
+                let pinch = null, before = null, mousePan = null;
+                const onCourt = (e) => e.target === svg || svg.contains(e.target);
+
+                // Remember the play before a finger touches it, so a pinch can take back what that finger started
+                const remember = () => {
+                    const play = this.getCurrentPlay();
+                    if (!play) { before = null; return; }
+                    const h = this.getHistoryEntry(play.id);
+                    before = { play, json: JSON.stringify(play), undo: h ? h.undo.length : 0, redo: h ? h.redo.slice() : [], sel: this.selectedElement, multi: this.multiSel.slice() };
+                };
+                const takeBackFirstFinger = () => {
+                    if (this.activePointerId !== null) { try { svg.releasePointerCapture(this.activePointerId); } catch (_) {} }
+                    this.activePointerId = null;
+                    this.dragState = null;
+                    if (before && before.play === this.getCurrentPlay()) {
+                        if (JSON.stringify(before.play) !== before.json) {
+                            const restored = JSON.parse(before.json);
+                            Object.keys(before.play).forEach(k => delete before.play[k]);
+                            Object.assign(before.play, restored);
+                            this.scheduleSave();
+                        }
+                        const h = this.getHistoryEntry(before.play.id);
+                        if (h) { h.undo.length = Math.min(h.undo.length, before.undo); h.redo = before.redo; }
+                        this.selectedElement = before.sel;
+                        this.multiSel = before.multi;
+                    }
+                    if (document.getElementById('text-modal')?.classList.contains('flex')) this.closeTextModal();
+                    this.renderCourt();
+                    if (this.syncInspectorUI) this.syncInspectorUI();
+                    if (this.updateUndoRedoButtons) this.updateUndoRedoButtons();
+                };
+                const startPinch = () => {
+                    const [a, b] = [...touches.values()];
+                    const rect = svg.getBoundingClientRect(), vb = this.courtViewBox();
+                    const mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2;
+                    pinch = {
+                        d0: Math.hypot(a.x - b.x, a.y - b.y) || 1, z0: this.zoom.z,
+                        px: vb.x + ((mx - rect.left) / (rect.width || 1)) * vb.w,
+                        py: vb.y + ((my - rect.top) / (rect.height || 1)) * vb.h, lone: false
+                    };
+                };
+                const movePinch = () => {
+                    if (!pinch || pinch.lone || touches.size < 2) return;
+                    const [a, b] = [...touches.values()];
+                    const rect = svg.getBoundingClientRect();
+                    const fx = (((a.x + b.x) / 2) - rect.left) / (rect.width || 1), fy = (((a.y + b.y) / 2) - rect.top) / (rect.height || 1);
+                    let z = this.clamp(pinch.z0 * (Math.hypot(a.x - b.x, a.y - b.y) / pinch.d0), 1, this.ZOOM_MAX);
+                    if (z < 1.02) z = 1;
+                    const W = 500, H = this.courtType === 'full' ? 940 : 470;
+                    // The court point that started under the fingers stays under them (zoom + pan together)
+                    this.zoom = { z, x: pinch.px - fx * (W / z), y: pinch.py - fy * (H / z), type: this.courtType };
+                    this.applyCourtZoom();
+                };
+
+                stage.addEventListener('pointerdown', (e) => {
+                    if (e.pointerType === 'mouse') {
+                        if (e.button === 1 && this.zoom.z > 1 && onCourt(e)) {
+                            e.preventDefault(); e.stopPropagation();
+                            mousePan = { id: e.pointerId, x: e.clientX, y: e.clientY };
+                            try { stage.setPointerCapture(e.pointerId); } catch (_) {}
+                        }
+                        return;
+                    }
+                    if (!onCourt(e) && !pinch) return;
+                    touches.set(e.pointerId, { x: e.clientX, y: e.clientY });
+                    if (pinch) { e.stopPropagation(); return; }
+                    if (touches.size === 1) { remember(); return; }
+                    if (touches.size === 2) {
+                        e.stopPropagation(); e.preventDefault();
+                        takeBackFirstFinger();
+                        startPinch();
+                        touches.forEach((_, id) => { try { stage.setPointerCapture(id); } catch (_) {} });
+                    }
+                }, true);
+
+                stage.addEventListener('pointermove', (e) => {
+                    if (mousePan && e.pointerId === mousePan.id) {
+                        e.stopPropagation();
+                        this.panCourtBy(mousePan.x - e.clientX, mousePan.y - e.clientY);
+                        mousePan.x = e.clientX; mousePan.y = e.clientY;
+                        return;
+                    }
+                    if (!touches.has(e.pointerId)) return;
+                    touches.set(e.pointerId, { x: e.clientX, y: e.clientY });
+                    if (pinch) { e.stopPropagation(); e.preventDefault(); movePinch(); }
+                }, true);
+
+                const end = (e) => {
+                    if (mousePan && e.pointerId === mousePan.id) { mousePan = null; e.stopPropagation(); return; }
+                    if (!touches.has(e.pointerId)) return;
+                    touches.delete(e.pointerId);
+                    if (pinch) {
+                        e.stopPropagation();
+                        if (touches.size === 0) pinch = null;
+                        else pinch.lone = true;              // the finger left on the glass must not start drawing
+                    }
+                };
+                stage.addEventListener('pointerup', end, true);
+                stage.addEventListener('pointercancel', end, true);
+
+                // Trackpad pinch and Ctrl + scroll zoom; plain scroll pans while zoomed in
+                stage.addEventListener('wheel', (e) => {
+                    if (!this.getCurrentPlay()) return;
+                    if (e.ctrlKey || e.metaKey) {
+                        e.preventDefault();
+                        const dy = e.deltaMode === 1 ? e.deltaY * 16 : e.deltaY;
+                        this.zoomCourtTo(this.zoom.z * Math.exp(-dy * 0.004), e.clientX, e.clientY);   // ~1.5x per mouse-wheel notch
+                    } else if (this.zoom.z > 1 && onCourt(e)) {
+                        e.preventDefault();
+                        const k = e.deltaMode === 1 ? 16 : 1;
+                        const dx = e.shiftKey && !e.deltaX ? e.deltaY : e.deltaX, dy = e.shiftKey && !e.deltaX ? 0 : e.deltaY;
+                        this.panCourtBy(dx * k, dy * k);
+                    }
+                }, { passive: false });
+
+                document.addEventListener('keydown', (e) => {
+                    const t = e.target, typing = t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable);
+                    if (typing || e.ctrlKey || e.metaKey || e.altKey || this.getOpenModal() || this.tour || !this.getCurrentPlay()) return;
+                    if (e.key === '+' || e.key === '=') { e.preventDefault(); this.zoomCourtTo(this.zoom.z * 1.5); }
+                    else if (e.key === '-' || e.key === '_') { e.preventDefault(); this.zoomCourtTo(this.zoom.z / 1.5); }
+                    else if (e.key === '0') { e.preventDefault(); this.zoomCourtTo(1); }
+                });
+
+                // A different play starts fully zoomed out
+                const select = this.selectPlay;
+                this.selectPlay = (...args) => {
+                    const prev = this.currentPlayId;
+                    const r = select.apply(this, args);
+                    if (this.currentPlayId !== prev && this.zoom.z > 1) this.zoomCourtTo(1);
+                    return r;
+                };
+                this.applyCourtZoom();
+            }
+        });
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            // Read the saved playbook from IndexedDB first (async), then start the app
+            if (window.FPStore) { try { await window.FPStore.boot('fastplay_pro_local_playbook_v3'); } catch (e) { console.warn('Storage boot failed', e); } }
             window.fastPlay = new FastPlayStudio();
         });
     </script>
