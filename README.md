@@ -8,6 +8,7 @@ A basketball playbook studio that runs in the browser: draw plays, animate them,
 - **Saves on the device.** Playbooks are stored in the browser's IndexedDB, with no 5 MB cap. The app asks the browser not to clear them.
 - **Syncs through Google Drive** (optional). Every playbook stays in sync across a coach's devices through one file in their own Drive.
   On a new computer or browser, the "Your Playbook is Empty" screen offers **Load My Plays from Google Drive**: one sign-in brings everything back.
+- **Settings.** Defaults for new plays (court markings, size, basket position, theme, category), drawing helpers, line color, labels, animation speed and PDF layout. Saved on the device and synced through Google Drive.
 - **Zoom.** Pinch the court, use Ctrl + scroll, or the − / + buttons. While zoomed in, move around with two fingers, scroll / Shift + scroll, or Space + drag.
 
 ## Files

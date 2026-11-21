@@ -171,16 +171,16 @@
                 <div class="hidden md:block">
                     <div class="flex items-center space-x-1.5">
                         <span class="font-extrabold tracking-tight text-base text-white">FAST<span class="text-orange-500">PLAY</span></span>
-                        <span class="hidden min-[1680px]:inline-block text-[10px] font-mono uppercase bg-orange-500/20 text-orange-400 border border-orange-500/30 px-1.5 py-0.5 rounded font-semibold">LOCAL STUDIO</span>
+                        <span class="hidden min-[1800px]:inline-block text-[10px] font-mono uppercase bg-orange-500/20 text-orange-400 border border-orange-500/30 px-1.5 py-0.5 rounded font-semibold">LOCAL STUDIO</span>
                     </div>
-                    <p class="hidden 2xl:block text-[10px] text-slate-400 -mt-0.5">Basketball Playbook &amp; Tactical Diagramming</p>
+                    <p class="hidden min-[1800px]:block text-[10px] text-slate-400 -mt-0.5">Basketball Playbook &amp; Tactical Diagramming</p>
                 </div>
             </div>
 
             <!-- Desktop xl+ Play Meta & Court Controls -->
             <div id="header-meta" class="hidden xl:flex items-center space-x-2 flex-1 min-w-0 max-w-5xl overflow-x-auto touch-scroll-x py-0.5">
                 <input id="header-play-title" type="text" value="" placeholder="No active play"
-                    class="ml-auto shrink-0 bg-slate-950 border border-slate-700/80 hover:border-slate-600 focus:border-orange-500 focus:outline-none text-sm font-bold text-white placeholder-slate-400 rounded-lg px-2.5 py-1.5 w-36 2xl:w-56 disabled:opacity-50 transition"
+                    class="ml-auto shrink-0 bg-slate-950 border border-slate-700/80 hover:border-slate-600 focus:border-orange-500 focus:outline-none text-sm font-bold text-white placeholder-slate-400 rounded-lg px-2.5 py-1.5 w-28 min-[1366px]:w-36 2xl:w-56 disabled:opacity-50 transition"
                     title="Rename current play" autocomplete="off" />
                 <select id="header-play-category" class="bg-slate-950 border border-slate-700/80 text-xs text-slate-200 rounded-lg px-2 py-1.5 focus:outline-none focus:border-orange-500 disabled:opacity-50" autocomplete="off">
                     <option value="Half-Court Man">Half-Court Man</option>
@@ -218,7 +218,7 @@
             <!-- Right Action Buttons -->
             <div class="flex items-center space-x-1.5 shrink-0">
                 <button id="btn-huddle" class="min-h-[34px] sm:min-h-[36px] flex items-center space-x-1 bg-slate-800 hover:bg-slate-700 active:scale-95 border border-slate-700 text-amber-300 text-xs font-bold px-2.5 sm:px-3 py-1.5 rounded-lg transition" title="Huddle Mode: full-screen court for timeouts">
-                    <i class="ph-bold ph-corners-out text-sm"></i><span class="hidden md:inline xl:hidden min-[1680px]:inline">Huddle</span>
+                    <i class="ph-bold ph-corners-out text-sm"></i><span class="hidden md:inline xl:hidden min-[1800px]:inline">Huddle</span>
                 </button>
                 <button id="btn-run-play" class="min-h-[34px] sm:min-h-[36px] flex items-center space-x-1 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white text-xs font-bold px-2.5 sm:px-3 py-1.5 rounded-lg shadow shadow-emerald-600/25 transition">
                     <i class="ph-fill ph-play text-sm" id="btn-run-play-icon"></i>
@@ -231,10 +231,13 @@
                 </button>
                 <button id="btn-open-storage" class="min-h-[34px] sm:min-h-[36px] flex items-center space-x-1 bg-slate-800 hover:bg-slate-700 active:scale-95 border border-slate-700 text-slate-200 text-xs font-semibold px-2.5 sm:px-3 py-1.5 rounded-lg transition" title="Save / Load Playbook">
                     <i class="ph-bold ph-floppy-disk text-sm text-sky-400"></i>
-                    <span class="hidden sm:inline xl:hidden min-[1680px]:inline">Save / Load</span>
+                    <span class="hidden sm:inline xl:hidden min-[1800px]:inline">Save / Load</span>
+                </button>
+                <button id="btn-settings" class="hidden sm:flex min-w-[34px] min-h-[34px] sm:min-h-[36px] items-center justify-center bg-slate-800 hover:bg-slate-700 active:scale-95 border border-slate-700 text-slate-200 px-2 py-1.5 rounded-lg transition" title="Settings (Ctrl + ,)" aria-label="Settings">
+                    <i class="ph-bold ph-gear-six text-sm"></i>
                 </button>
                 <button id="btn-help" class="min-w-[34px] min-h-[34px] sm:min-h-[36px] flex items-center justify-center space-x-1 bg-slate-800 hover:bg-slate-700 active:scale-95 border border-slate-700 text-sky-300 text-xs font-bold px-2 sm:px-2.5 py-1.5 rounded-lg transition" title="Help, tutorial and guided tour (?)" aria-label="Help">
-                    <span class="font-extrabold text-sm leading-none">?</span><span class="hidden lg:inline xl:hidden min-[1680px]:inline">Help</span>
+                    <span class="font-extrabold text-sm leading-none">?</span><span class="hidden lg:inline xl:hidden min-[1800px]:inline">Help</span>
                 </button>
                 <button id="btn-toggle-right" class="min-w-[34px] min-h-[34px] sm:min-w-[36px] sm:min-h-[36px] p-1.5 rounded-lg border border-orange-500/60 bg-slate-800 hover:bg-slate-700 text-orange-400 flex items-center justify-center transition" title="Toggle Inspector &amp; Notes Sidebar" aria-label="Toggle Inspector Sidebar">
                     <i class="ph-bold ph-sliders-horizontal text-base sm:text-lg"></i>
@@ -340,6 +343,7 @@
                         <button id="btn-open-roster" class="min-h-[32px] flex items-center justify-center space-x-1 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-[11px] font-semibold py-1 rounded-lg transition text-sky-300" title="Team roster, starters and per-play lineups"><i class="ph-bold ph-users-three"></i><span>Roster</span></button>
                         <button id="btn-open-practice" class="min-h-[32px] flex items-center justify-center space-x-1 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-[11px] font-semibold py-1 rounded-lg transition text-violet-300" title="Timed practice plans with play diagrams"><i class="ph-bold ph-clipboard-text"></i><span>Practice</span></button>
                         <button id="btn-open-study" class="min-h-[32px] flex items-center justify-center space-x-1 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-[11px] font-semibold py-1 rounded-lg transition text-emerald-300" title="Quiz: tap where your position goes"><i class="ph-bold ph-student"></i><span>Study</span></button>
+                        <button id="btn-open-settings-side" class="col-span-2 min-h-[32px] flex items-center justify-center space-x-1 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-[11px] font-semibold py-1 rounded-lg transition text-slate-200" title="Your defaults: court markings, court size, drawing tools, animation speed and more (Ctrl + ,)"><i class="ph-bold ph-gear-six"></i><span>Settings</span></button>
                     </div>
                     <div id="play-library-list" class="flex-1 overflow-y-auto space-y-1.5 pr-0.5"></div>
                 </div>
@@ -1100,6 +1104,69 @@
     </div>
 
     <!-- MODAL 7: ROSTER & LINEUPS -->
+    <!-- SETTINGS -->
+    <div id="settings-modal" role="dialog" aria-modal="true" aria-label="Settings" class="fixed inset-0 bg-black/75 backdrop-blur-sm hidden items-center justify-center p-2 sm:p-4 z-50 no-print">
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-xl max-h-[92dvh] flex flex-col shadow-2xl overflow-hidden">
+            <div class="px-4 sm:px-5 py-3.5 border-b border-slate-800 flex items-center justify-between shrink-0">
+                <div class="flex items-center space-x-2 min-w-0">
+                    <i class="ph-bold ph-gear-six text-orange-400 text-lg shrink-0"></i>
+                    <div class="min-w-0"><h2 class="text-sm font-bold text-white">Settings</h2><p id="settings-saved-note" class="text-[11px] text-slate-400 truncate">Changes save automatically on this device.</p></div>
+                </div>
+                <button id="btn-close-settings" class="min-w-[32px] min-h-[32px] flex items-center justify-center rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition" aria-label="Close"><i class="ph-bold ph-x text-base"></i></button>
+            </div>
+            <div class="p-4 sm:p-5 space-y-4 text-xs overflow-y-auto">
+                <section class="space-y-2.5">
+                    <h3 class="text-[11px] font-extrabold uppercase tracking-wider text-orange-300">New plays</h3>
+                    <p class="text-[11px] text-slate-400 -mt-1">Used for new plays, templates and starter plays. To change one play, use the controls at the top of the screen.</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                        <label class="block"><span class="block text-[11px] font-semibold text-slate-300 mb-1">Court markings</span><select id="set-courtRules" data-setting="courtRules" class="w-full min-h-[34px] bg-slate-950 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-orange-500"><option value="nba">NBA</option><option value="ncaa">NCAA</option><option value="nfhs">High School</option><option value="fiba">FIBA</option></select></label>
+                        <label class="block"><span class="block text-[11px] font-semibold text-slate-300 mb-1">Court size</span><select id="set-courtType" data-setting="courtType" class="w-full min-h-[34px] bg-slate-950 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-orange-500"><option value="half">Half court</option><option value="full">Full court</option></select></label>
+                        <label class="block"><span class="block text-[11px] font-semibold text-slate-300 mb-1">Basket position</span><select id="set-hoopBottom" data-setting="hoopBottom" class="w-full min-h-[34px] bg-slate-950 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-orange-500"><option value="false">Top of the screen</option><option value="true">Bottom of the screen</option></select></label>
+                        <label class="block"><span class="block text-[11px] font-semibold text-slate-300 mb-1">Court theme</span><select id="set-courtTheme" data-setting="courtTheme" class="w-full min-h-[34px] bg-slate-950 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-orange-500"><option value="hardwood">Hardwood</option><option value="chalk">Slate Dark</option><option value="clean">Clean White</option></select></label>
+                        <label class="block"><span class="block text-[11px] font-semibold text-slate-300 mb-1">Category</span><select id="set-category" data-setting="category" class="w-full min-h-[34px] bg-slate-950 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-orange-500"><option value="Half-Court Man">Half-Court Man</option><option value="Zone Offense">Zone Offense</option><option value="BLOB">BLOB</option><option value="SLOB">SLOB</option><option value="Transition">Transition</option><option value="Press Break">Press Break</option><option value="Practice Drill">Practice Drill</option></select></label>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-2 pt-0.5">
+                        <button id="btn-settings-apply-all" class="min-h-[32px] px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-sky-300 font-semibold transition">Apply markings &amp; theme to every play in this playbook</button>
+                    </div>
+                </section>
+                <section class="space-y-1 border-t border-slate-800 pt-3.5">
+                    <h3 class="text-[11px] font-extrabold uppercase tracking-wider text-orange-300 mb-1">Drawing</h3>
+                    <label class="flex items-center justify-between gap-3 py-1.5"><span class="min-w-0"><span class="block text-xs font-semibold text-slate-200">Snap lines to players</span><span class="block text-[10.5px] text-slate-500">Lines attach to the player they start from and follow them (toolbar: Snap).</span></span><input type="checkbox" id="set-anchorSnap" data-setting="anchorSnap" class="w-4 h-4 accent-orange-500 shrink-0" /></label>
+                    <label class="flex items-center justify-between gap-3 py-1.5"><span class="min-w-0"><span class="block text-xs font-semibold text-slate-200">Curved lines</span><span class="block text-[10.5px] text-slate-500">New lines bend naturally; off draws straight lines (toolbar: Curve).</span></span><input type="checkbox" id="set-autoCurve" data-setting="autoCurve" class="w-4 h-4 accent-orange-500 shrink-0" /></label>
+                    <label class="flex items-center justify-between gap-3 py-1.5"><span class="min-w-0"><span class="block text-xs font-semibold text-slate-200">Court guides</span><span class="block text-[10.5px] text-slate-500">Show labeled court spots and snap players to them (toolbar: Guides).</span></span><input type="checkbox" id="set-showGuides" data-setting="showGuides" class="w-4 h-4 accent-orange-500 shrink-0" /></label>
+                    <label class="flex items-center justify-between gap-3 py-1.5"><span class="min-w-0"><span class="block text-xs font-semibold text-slate-200">Ghost of previous frame</span><span class="block text-[10.5px] text-slate-500">Show the previous frame faintly behind the current one (toolbar: Ghost).</span></span><input type="checkbox" id="set-onionSkin" data-setting="onionSkin" class="w-4 h-4 accent-orange-500 shrink-0" /></label>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1.5">
+                        <label class="block"><span class="block text-[11px] font-semibold text-slate-300 mb-1">Player labels</span><select id="set-labelMode" data-setting="labelMode" class="w-full min-h-[34px] bg-slate-950 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-orange-500"><option value="pos">Positions (1 to 5)</option><option value="num">Jersey numbers</option><option value="name">Names</option></select><p class="text-[10.5px] text-slate-500 mt-0.5">Numbers and names come from the Roster.</p></label>
+                        <div><span class="block text-[11px] font-semibold text-slate-300 mb-1">Line color</span>
+                            <div id="set-strokeColor" class="flex items-center gap-2 min-h-[34px]">
+                                <button data-color="#0f172a" class="set-color w-7 h-7 rounded-full bg-slate-900 border-2 border-slate-600" title="Ink Dark" aria-label="Ink Dark"></button>
+                                <button data-color="#dc2626" class="set-color w-7 h-7 rounded-full bg-red-600 border-2 border-slate-600" title="Red" aria-label="Red"></button>
+                                <button data-color="#2563eb" class="set-color w-7 h-7 rounded-full bg-blue-600 border-2 border-slate-600" title="Blue" aria-label="Blue"></button>
+                                <button data-color="#16a34a" class="set-color w-7 h-7 rounded-full bg-green-600 border-2 border-slate-600" title="Green" aria-label="Green"></button>
+                                <button data-color="#f97316" class="set-color w-7 h-7 rounded-full bg-orange-500 border-2 border-slate-600" title="Orange" aria-label="Orange"></button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <section class="space-y-2.5 border-t border-slate-800 pt-3.5">
+                    <h3 class="text-[11px] font-extrabold uppercase tracking-wider text-orange-300">Animation &amp; export</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                        <label class="block"><span class="block text-[11px] font-semibold text-slate-300 mb-1">Animation speed</span><select id="set-animSpeed" data-setting="animSpeed" class="w-full min-h-[34px] bg-slate-950 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-orange-500"><option value="0.5">0.5x (slow)</option><option value="1">1.0x</option><option value="1.5">1.5x</option><option value="2">2.0x (fast)</option></select></label>
+                        <label class="block"><span class="block text-[11px] font-semibold text-slate-300 mb-1">PlaySheet PDF layout</span><select id="set-sheetCols" data-setting="sheetCols" class="w-full min-h-[34px] bg-slate-950 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-orange-500"><option value="1">1 frame per row</option><option value="2">2 frames per row</option><option value="3">3 frames per row</option></select></label>
+                    </div>
+                </section>
+                <section class="space-y-1 border-t border-slate-800 pt-3.5">
+                    <h3 class="text-[11px] font-extrabold uppercase tracking-wider text-orange-300 mb-1">Help &amp; reminders</h3>
+                    <label class="flex items-center justify-between gap-3 py-1.5"><span class="min-w-0"><span class="block text-xs font-semibold text-slate-200">Backup reminders</span><span class="block text-[10.5px] text-slate-500">A reminder when your last backup or sync is more than a week old.</span></span><input type="checkbox" id="set-backupReminders" data-setting="backupReminders" class="w-4 h-4 accent-orange-500 shrink-0" /></label>
+                    <label class="flex items-center justify-between gap-3 py-1.5"><span class="min-w-0"><span class="block text-xs font-semibold text-slate-200">Tips</span><span class="block text-[10.5px] text-slate-500">Short tips the first time you use a feature, and the offer to take the tour.</span></span><input type="checkbox" id="set-tips" data-setting="tips" class="w-4 h-4 accent-orange-500 shrink-0" /></label>
+                </section>
+                <div class="border-t border-slate-800 pt-3.5 flex flex-wrap items-center justify-between gap-2">
+                    <p id="settings-sync-note" class="text-[11px] text-slate-400 flex-1 min-w-[180px]">Settings are saved on this device.</p>
+                    <button id="btn-settings-reset" class="min-h-[32px] px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 font-semibold transition">Reset to Defaults</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <div id="roster-modal" role="dialog" aria-modal="true" aria-label="Roster" class="fixed inset-0 bg-black/75 backdrop-blur-sm hidden items-center justify-center p-2 sm:p-4 z-50 no-print">
         <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-h-[92dvh] flex flex-col shadow-2xl overflow-hidden max-w-2xl">
             <div class="px-4 sm:px-5 py-3.5 border-b border-slate-800 flex items-center justify-between shrink-0">
@@ -2519,7 +2586,7 @@
                 });
                 return {
                     id: this.uid('play'), name: t.name, category: t.category, tags: t.tags || '', folder: t.folder || '', call: '', lineup: {},
-                    courtType: t.court || 'half', courtTheme: 'hardwood', courtRules: this.defaultRules || 'nba', hoopBottom: false, frames
+                    courtType: t.court || 'half', courtTheme: (this.settings && this.settings.courtTheme) || 'hardwood', courtRules: (this.settings && this.settings.courtRules) || 'nba', hoopBottom: !!(this.settings && this.settings.hoopBottom), frames
                 };
             }
 
@@ -2742,15 +2809,17 @@
             // PLAYBOOK & FRAME CRUD
             // =========================================================================
 
-            createNewPlay(name = null, category = 'Half-Court Man') {
+            createNewPlay(name = null, category = null) {
+                const d = this.settings || {};
                 this.stopAnimation();
                 const newPlay = {
                     id: this.uid('play'),
                     name: name || `New Play ${this.plays.length + 1}`,
-                    category, tags: '',
-                    courtType: this.courtType || 'half',
-                    courtTheme: this.courtTheme || 'hardwood',
-                    courtRules: this.defaultRules || 'nba', hoopBottom: false, folder: '', call: '', lineup: {},
+                    category: category || d.category || 'Half-Court Man', tags: '',
+                    // new plays start from the defaults in Settings
+                    courtType: d.courtType || 'half',
+                    courtTheme: d.courtTheme || 'hardwood',
+                    courtRules: d.courtRules || 'nba', hoopBottom: !!d.hoopBottom, folder: '', call: '', lineup: {},
                     frames: [this.createBlankFrame(true, '')]
                 };
                 this.plays.unshift(newPlay);
@@ -6538,8 +6607,9 @@ body.fv-menu-open .fv-side{transform:none}body.fv-menu-open .fv-scrim{display:bl
 <li>Type what should happen in <b>Coaching Points</b> on the right.</li>
 <li>Press <b>Run Play</b> to watch it animate, then <b>PDF</b> to print it.</li>
 </ol>
-<div class="tip">Tip: press <kbd>?</kbd> anywhere to open this Help Center, and use the search box above to jump to any topic.</div>
-${act('tour', 'Take the guided tour')} ${act('templates', 'Open the template library')} ${act('newplay', 'Create a new play')} ${act('drive', 'Load my plays from Google Drive')}` },
+<div class="tip">Tip: open <b>Settings</b> (the gear at the top, or <kbd>Ctrl</kbd>+<kbd>,</kbd>) first to choose your court markings (for example High School or NCAA), court size and drawing defaults, so every new play starts the way you like.</div>
+<div class="tip">Press <kbd>?</kbd> anywhere to open this Help Center, and use the search box above to jump to any topic.</div>
+${act('tour', 'Take the guided tour')} ${act('settings', 'Open Settings')} ${act('templates', 'Open the template library')} ${act('newplay', 'Create a new play')} ${act('drive', 'Load my plays from Google Drive')}` },
 
                     { id: 'layout', title: 'The Screen Layout', html: `
 <h3>Where everything is</h3>
@@ -6550,11 +6620,11 @@ ${act('tour', 'Take the guided tour')} ${act('templates', 'Open the template lib
 <li><b>Half / Full</b>: half-court or full-court diagram. <b>Hoop Top / Bottom</b>: which end the basket is drawn at.</li>
 <li><b>Theme</b> (Hardwood, Slate Dark, Clean White) and <b>court markings</b> (NBA, NCAA, High School, FIBA).</li>
 <li><b>Status</b>: <b>Saved</b> when your work is stored on this device, <b>Synced</b> when it is also in Google Drive. Amber <b>Sync</b> means Google needs you to sign in again: tap it. Tap the status any time to sync right away.</li>
-<li><b>Huddle</b>, <b>Run Play</b>, <b>PDF</b> (the export window), <b>Save / Load</b> (backups, import, Google Drive sync, install) and <b>Help</b>. On smaller screens some of these show only their icon; hover or long-press for the name.</li>
+<li><b>Huddle</b>, <b>Run Play</b>, <b>PDF</b> (the export window), <b>Save / Load</b> (backups, import, Google Drive sync, install), <b>Settings</b> (gear) and <b>Help</b>. On smaller screens some of these show only their icon; hover or long-press for the name.</li>
 </ul>
 <p>On narrower screens the title, Half/Full, hoop, category, theme and court markings move to a second scrolling row under the top bar.</p>
 <h4>Left sidebar</h4>
-<ul><li><b>Playbook</b> tab: playbook switcher, search and category filter, New Play, Duplicate, Publish Playbook PDF, Templates, Roster, Practice, Study, and your play list.</li>
+<ul><li><b>Playbook</b> tab: playbook switcher, search and category filter, New Play, Duplicate, Publish Playbook PDF, Templates, Roster, Practice, Study, <b>Settings</b>, and your play list.</li>
 <li><b>Sets &amp; Defense</b> tab: offensive formations, full-court sets and presses, transform tools (mirror, flip, copy) and defensive overlays.</li></ul>
 <h4>Center</h4>
 <ul><li><b>Toolbar</b>: drawing tools, undo/redo, Snap, Curve, Ghost, Guides, Steps, label mode, colors, delete and Clear.</li>
@@ -6666,6 +6736,7 @@ ${act('tour', 'Take the guided tour')} ${act('templates', 'Open the template lib
 <ul><li><b>Half / Full</b>: switching a full-court play to half court moves anything below half court onto the half court (Undo restores it).</li>
 <li><b>Court markings</b>: NBA (16 ft lane, 23 ft 9 in arc), NCAA (12 ft lane, 22 ft 1.75 in arc), High School (12 ft lane, 19 ft 9 in arc, no restricted area) and FIBA (4.9 m lane, 6.75 m arc). Each play remembers its own.</li>
 <li><b>Hoop Top / Bottom</b> and <b>themes</b> are saved per play too.</li>
+<li><b>Defaults for new plays</b>: choose the markings, half or full court, basket position and theme in <b>Settings</b>. To switch every play in a playbook to those markings at once, use <b>Apply markings &amp; theme to every play</b> there.</li>
 <li><b>Guides</b>: shows labeled landmarks (blocks, elbows, nail, slots, wings, corners, dunker spots). With guides on, players, cones, labels and line ends snap to these spots when you drag near them.</li>
 <li><b>Ghost</b> (<kbd>G</kbd>): shows the previous frame faintly behind the current one so spacing stays consistent from frame to frame.</li>
 <li><b>Zoom</b>: get closer to a crowded spot. Zoom only changes your view: exports and PDFs always show the whole court, and switching plays shows the whole court again.</li></ul>
@@ -6675,6 +6746,28 @@ ${act('tour', 'Take the guided tour')} ${act('templates', 'Open the template lib
 <tr><td><b>Trackpad</b></td><td>Pinch, or the <b>&minus; / +</b> buttons</td><td>Swipe with two fingers in any direction</td></tr>
 <tr><td><b>Mouse</b></td><td><kbd>Ctrl</kbd> + scroll wheel, the <b>&minus; / +</b> buttons, or <kbd>+</kbd> / <kbd>&minus;</kbd></td><td>Scroll = up / down, <kbd>Shift</kbd> + scroll = sideways, or hold <kbd>Space</kbd> and drag (middle-button drag works too)</td></tr></table>
 <p>Press <kbd>0</kbd> or click the percentage between the buttons to see the whole court again.</p>` },
+
+                    { id: 'settings', title: 'Settings & Preferences', html: `
+<h3>Settings and preferences</h3>
+<p>Settings hold your defaults so you don't set the same things up every time. Open them with the <b>gear</b> at the top of the screen, the <b>Settings</b> button in the Playbook tab (on phones), or <kbd>Ctrl</kbd>+<kbd>,</kbd> (<kbd>Cmd</kbd>+<kbd>,</kbd> on Mac). Every change saves the moment you make it.</p>
+<table><tr><th>Setting</th><th>What it does</th></tr>
+<tr><td><b>Court markings</b></td><td>NBA, NCAA, High School or FIBA lines for new plays, templates and starter plays.</td></tr>
+<tr><td><b>Court size</b></td><td>New plays start on a half court or a full court.</td></tr>
+<tr><td><b>Basket position</b></td><td>Basket at the top or bottom of the screen for new plays.</td></tr>
+<tr><td><b>Court theme</b></td><td>Hardwood, Slate Dark or Clean White for new plays.</td></tr>
+<tr><td><b>Category</b></td><td>The category new plays are filed under.</td></tr>
+<tr><td><b>Snap, Curved lines, Court guides, Ghost</b></td><td>Whether these drawing helpers start on or off.</td></tr>
+<tr><td><b>Player labels</b></td><td>Positions (1 to 5), jersey numbers or names (from the Roster).</td></tr>
+<tr><td><b>Line color</b></td><td>The color new lines are drawn in.</td></tr>
+<tr><td><b>Animation speed</b></td><td>How fast <b>Run Play</b> plays.</td></tr>
+<tr><td><b>PlaySheet PDF layout</b></td><td>1, 2 or 3 frames per row on a play's PDF.</td></tr>
+<tr><td><b>Backup reminders</b> / <b>Tips</b></td><td>Turn the weekly backup reminder and first-time tips on or off.</td></tr></table>
+<p>The toolbar remembers too: turning Snap, Curve, Ghost or Guides on or off, picking a line color, label mode or animation speed updates your settings.</p>
+<h4>Changing plays you already have</h4>
+<p>Settings shape new plays; existing plays keep their own court. <b>Apply markings &amp; theme to every play in this playbook</b> switches all plays in the open playbook at once (Undo is in the message that appears). To change one play, use the controls at the top of the screen.</p>
+<h4>On your other devices</h4>
+<p>With <b>Google Drive sync</b> on, your settings travel with your plays: sign in on a new computer and it's set up the way you like. If you change settings on two devices, the most recent change wins. <b>Reset to Defaults</b> puts everything back the way it came.</p>
+${act('settings', 'Open Settings')}` },
 
                     { id: 'animation', title: 'Animation & Timing', html: `
 <h3>Running your play</h3>
@@ -6774,7 +6867,7 @@ ${act('templates', 'Open the template library')}` },
 
                     { id: 'sync', title: 'Sync Between Devices', html: `
 <h3>Sync between devices</h3>
-<p>Drive sync keeps <b>all</b> your playbooks (plays, rosters and practice plans) the same on every device where you sign in with the same Google account. They are stored in one file, <code>FastPlay Pro Sync.json</code>, in your own Google Drive. FastPlay Pro can only see that file, nothing else in your Drive, and no one else can see it.</p>
+<p>Drive sync keeps <b>all</b> your playbooks (plays, rosters and practice plans) and your <b>Settings</b> the same on every device where you sign in with the same Google account. They are stored in one file, <code>FastPlay Pro Sync.json</code>, in your own Google Drive. FastPlay Pro can only see that file, nothing else in your Drive, and no one else can see it.</p>
 <h4>Turning it on</h4>
 <ol><li>Open <b>Save / Load</b> and tap <b>Connect Google Drive</b>.</li>
 <li>Choose your Google account and allow access.</li>
@@ -6782,7 +6875,7 @@ ${act('templates', 'Open the template library')}` },
 <h4>On a new computer, a new browser, or after clearing your browser</h4>
 <ol><li>Open FastPlay Pro. With no plays yet you'll see <b>Your Playbook is Empty</b>.</li>
 <li>Tap <b>Load My Plays from Google Drive</b> and sign in with the same Google account.</li>
-<li>Your playbooks, rosters and practice plans load in a few seconds, and sync stays on for that browser.</li></ol>
+<li>Your playbooks, rosters, practice plans and settings load in a few seconds, and sync stays on for that browser.</li></ol>
 <p>Nothing to load? You signed in with a different Google account than the one you synced with, or sync was never turned on where you made the plays.</p>
 <h4>How it works day to day</h4>
 <ul><li>Changes sync a few seconds after you make them, when the app opens, and every couple of minutes while it's open.</li>
@@ -6824,6 +6917,7 @@ ${act('drive', 'Connect Google Drive now')} ${act('storage', 'Open Save / Load')
 <tr><td><kbd>Ctrl</kbd> + scroll</td><td>Zoom at the pointer</td></tr>
 <tr><td>Scroll / <kbd>Shift</kbd> + scroll</td><td>While zoomed in: move up and down / sideways</td></tr>
 <tr><td><kbd>Space</kbd> + drag</td><td>While zoomed in: move the court in any direction</td></tr>
+<tr><td><kbd>Ctrl</kbd>+<kbd>,</kbd></td><td>Open Settings (<kbd>Cmd</kbd>+<kbd>,</kbd> on Mac)</td></tr>
 <tr><td><kbd>?</kbd></td><td>Open this Help Center</td></tr></table>` },
 
                     { id: 'faq', title: 'Troubleshooting & FAQ', html: `
@@ -6834,6 +6928,10 @@ ${act('drive', 'Connect Google Drive now')} ${act('storage', 'Open Save / Load')
 <p>The line's end isn't attached. Select the line and click <b>Snap Nearest</b> in the Inspector, or drag its end handle onto the player with <b>Snap</b> on. Moving a whole line by hand detaches it on purpose.</p>
 <h4>Things animate in the wrong order.</h4>
 <p>Number the lines with <b>Step / Timing</b>. Same number = same time.</p>
+<h4>New plays use NBA lines, but I coach high school (or college).</h4>
+<p>Open <b>Settings</b> and choose your <b>Court markings</b>. New plays use them from then on; <b>Apply markings &amp; theme to every play in this playbook</b> updates the plays you already have.</p>
+<h4>Snap / Curve / Ghost keeps turning on (or off).</h4>
+<p>They start the way they're set in <b>Settings</b>, and the toolbar buttons change that setting too. Set them once and they stay.</p>
 <h4>How do I scroll sideways when I'm zoomed in?</h4>
 <p>Hold <kbd>Shift</kbd> while you scroll, swipe sideways with two fingers on a trackpad, or hold <kbd>Space</kbd> and drag the court. Press <kbd>0</kbd> to see the whole court.</p>
 <h4>The status says "Sync" in amber.</h4>
@@ -6903,6 +7001,7 @@ ${act('drive', 'Connect Google Drive now')} ${act('storage', 'Open Save / Load')
                 else if (a === 'newplay') { this.closeHelp(); this.createNewPlay(); }
                 else if (a === 'storage') { this.closeHelp(); this.openStorageModal(); }
                 else if (a === 'drive') { this.closeHelp(); this.driveConnect(); }
+                else if (a === 'settings') { this.closeHelp(); this.openSettings(); }
             }
 
             // ---- Guided tour ----
@@ -6927,6 +7026,7 @@ ${act('drive', 'Connect Google Drive now')} ${act('storage', 'Open Save / Load')
                     { sel: ['#btn-open-playsheet'], title: 'Export', body: 'PDF PlaySheet, print, PNG / SVG images, MP4 video and GIF. Whole Playbook opens the Publisher for multi-play PDFs, call sheets, wristbands and the Team Viewer.' },
                     { sel: ['#top-save-pill', '#mobile-save-pill'], title: 'Saved & synced', body: 'Shows that your work is saved on this device (Saved) and in Google Drive (Synced). Amber Sync means Google wants you to sign in again: tap it. Tap anytime to sync now.' },
                     { sel: ['#btn-open-storage'], title: 'Save / Load', body: 'Turn on Google Drive sync to have your plays on every computer, phone and browser, install the app, export .json backups, and import playbooks (as a new playbook or into this one).' },
+                    { sel: ['#btn-settings', '#btn-open-settings-side'], side: 'left', title: 'Settings', body: 'Set your defaults once: court markings (NBA, NCAA, High School, FIBA), court size, basket position, drawing helpers, line color, animation speed and more. They save automatically and sync with Google Drive. Shortcut: Ctrl + ,' },
                     { sel: ['#btn-help'], title: 'Help is always here', body: 'Open the Help Center (or press ?) for step-by-step instructions on everything. That\'s the tour. Go draw something!' }
                 ];
             }
@@ -7022,7 +7122,7 @@ ${act('drive', 'Connect Google Drive now')} ${act('storage', 'Open Save / Load')
                 if (seen) return;
                 setTimeout(() => {
                     // Someone loading their plays from Google Drive isn't new: don't cover the "Welcome back" message
-                    if (this.getOpenModal() || this.tour || (this.syncState && this.syncState.enabled)) return;
+                    if (this.getOpenModal() || this.tour || (this.syncState && this.syncState.enabled) || (this.settings && !this.settings.tips)) return;
                     this.showToast('New to FastPlay Pro? Take the 2-minute tour', 'info', 'Start Tour', () => this.startTour(), 12000);
                     this.savePrefs({ tourSeen: true });
                 }, 1200);
@@ -8022,7 +8122,7 @@ ${act('drive', 'Connect Google Drive now')} ${act('storage', 'Open Save / Load')
             }
 
             getOpenModal() {
-                return ['help-modal', 'prompt-modal', 'export-progress-modal', 'text-modal', 'study-modal', 'templates-modal', 'practice-modal', 'roster-modal', 'publisher-modal', 'playsheet-modal', 'storage-modal'].map(id => document.getElementById(id)).find(m => m && m.classList.contains('flex')) || null;
+                return ['settings-modal', 'help-modal', 'prompt-modal', 'export-progress-modal', 'text-modal', 'study-modal', 'templates-modal', 'practice-modal', 'roster-modal', 'publisher-modal', 'playsheet-modal', 'storage-modal'].map(id => document.getElementById(id)).find(m => m && m.classList.contains('flex')) || null;
             }
 
             closeModalById(id) {
@@ -8037,6 +8137,7 @@ ${act('drive', 'Connect Google Drive now')} ${act('storage', 'Open Save / Load')
                 else if (id === 'templates-modal') this.closeTemplatesModal();
                 else if (id === 'practice-modal') this.closePracticeModal();
                 else if (id === 'roster-modal') this.closeRosterModal();
+                else if (id === 'settings-modal') this.closeSettings();
             }
         }
 
@@ -8233,6 +8334,7 @@ ${act('drive', 'Connect Google Drive now')} ${act('storage', 'Open Save / Load')
 
             initExtensions() {
                 this.loadSyncState();
+                this.setupSettings();
                 this.bindExtensionUI();
                 this.setupCourtZoom();
                 window.addEventListener('resize', () => this.renderStatusPill());
@@ -8542,15 +8644,16 @@ ${act('drive', 'Connect Google Drive now')} ${act('storage', 'Open Save / Load')
                     const file = await this.driveFindFile();
                     const baseRec = await window.FPStore.getAux('syncBase');
                     const base = baseRec && file && baseRec.fileId === file.id ? baseRec : null;
-                    let remote = null;
+                    let remote = null, remoteSettings = null;
                     if (file) {
-                        if (base && base.modifiedTime === file.modifiedTime) remote = base.books;   // nothing new on Drive
+                        if (base && base.modifiedTime === file.modifiedTime) { remote = base.books; remoteSettings = { s: base.settings, at: base.settingsAt || 0 }; }   // nothing new on Drive
                         else {
                             const txt = await this.driveDownload(file.id);
                             let parsed = null;
                             try { parsed = JSON.parse(txt); } catch (_) {}
                             if (!parsed) throw new Error('The sync file in Google Drive is damaged. Delete "' + FP_DRIVE.fileName + '" in Drive to start fresh.');
                             remote = this.booksFromSaved(parsed).books;
+                            remoteSettings = { s: parsed.settings, at: Number(parsed.settingsAt) || 0 };
                         }
                     }
                     if (this.dragState) { this._syncAgain = true; return; }
@@ -8564,13 +8667,19 @@ ${act('drive', 'Connect Google Drive now')} ${act('storage', 'Open Save / Load')
                     const mergedKey = this.booksForCompare(merged);
                     const changedHere = mergedKey !== this.booksForCompare(local);
                     if (changedHere) this.applySyncedBooks(merged, local);
+                    // Settings: the most recently changed copy wins
+                    if (remoteSettings && remoteSettings.s && remoteSettings.at > (this.settingsAt || 0)) {
+                        this.saveSettings(remoteSettings.s, { fromSync: true, at: remoteSettings.at });
+                        this.applySettings();
+                    }
+                    const settingsNewerHere = (this.settingsAt || 0) > ((remoteSettings && remoteSettings.at) || 0);
 
                     let fileMeta = file;
-                    if (!remote || mergedKey !== this.booksForCompare(remote)) {
-                        const payload = JSON.stringify({ app: 'FastPlay Pro', version: 4, savedAt: new Date().toISOString(), books: merged });
+                    if (!remote || mergedKey !== this.booksForCompare(remote) || settingsNewerHere) {
+                        const payload = JSON.stringify({ app: 'FastPlay Pro', version: 4, savedAt: new Date().toISOString(), books: merged, settings: this.settings, settingsAt: this.settingsAt || 0 });
                         fileMeta = await this.driveUpload(file && file.id, payload);
                     }
-                    await window.FPStore.setAux('syncBase', { fileId: fileMeta.id, modifiedTime: fileMeta.modifiedTime, books: merged });
+                    await window.FPStore.setAux('syncBase', { fileId: fileMeta.id, modifiedTime: fileMeta.modifiedTime, books: merged, settings: this.settings, settingsAt: this.settingsAt || 0 });
                     st.lastSyncAt = Date.now();
                     this.saveSyncState();
                     this.setSyncStatus('synced');
@@ -8743,7 +8852,7 @@ ${act('drive', 'Connect Google Drive now')} ${act('storage', 'Open Save / Load')
             },
 
             maybeRemindBackup() {
-                if (this.getOpenModal() || this.tour) return;
+                if (this.getOpenModal() || this.tour || (this.settings && !this.settings.backupReminders)) return;
                 const plays = this.books.reduce((n, b) => n + b.plays.length, 0);
                 if (plays < 3) return;
                 const st = this.syncState || {};
@@ -8853,7 +8962,7 @@ ${act('drive', 'Connect Google Drive now')} ${act('storage', 'Open Save / Load')
                 const z = this.zoom.z;
                 const label = document.getElementById('btn-zoom-reset');
                 if (label) label.textContent = `${Math.round(z * 100)}%`;
-                if (z > 1 && !this._zoomTipDone) {
+                if (z > 1 && !this._zoomTipDone && !(this.settings && !this.settings.tips)) {
                     this._zoomTipDone = true;
                     let seen = false;
                     try { seen = !!JSON.parse(localStorage.getItem(this.STORAGE_KEY + '_prefs') || '{}').zoomTip; } catch (_) {}
@@ -9051,6 +9160,191 @@ ${act('drive', 'Connect Google Drive now')} ${act('storage', 'Open Save / Load')
                     return r;
                 };
                 this.applyCourtZoom();
+            }
+        });
+
+        // =========================================================================
+        // SETTINGS: the user's defaults, saved on the device and synced with Google Drive
+        // =========================================================================
+        const FP_DEFAULT_SETTINGS = {
+            courtRules: 'nba', courtType: 'half', hoopBottom: false, courtTheme: 'hardwood', category: 'Half-Court Man',
+            anchorSnap: true, autoCurve: true, showGuides: false, onionSkin: false, labelMode: 'pos', strokeColor: '#0f172a',
+            animSpeed: '1', sheetCols: '2', backupReminders: true, tips: true
+        };
+        const FP_SETTING_CHOICES = {
+            courtRules: ['nba', 'ncaa', 'nfhs', 'fiba'], courtType: ['half', 'full'], courtTheme: ['hardwood', 'chalk', 'clean'],
+            category: ['Half-Court Man', 'Zone Offense', 'BLOB', 'SLOB', 'Transition', 'Press Break', 'Practice Drill'],
+            labelMode: ['pos', 'num', 'name'], strokeColor: ['#0f172a', '#dc2626', '#2563eb', '#16a34a', '#f97316'],
+            animSpeed: ['0.5', '1', '1.5', '2'], sheetCols: ['1', '2', '3']
+        };
+        const FP_SETTINGS_TOGGLE_UI = {
+            autoCurve: ['curved-mode-btn', 'border-orange-500 text-orange-400'],
+            onionSkin: ['onion-btn', 'border-violet-400 text-violet-300'],
+            showGuides: ['guides-btn', 'border-sky-400 text-sky-300']
+        };
+
+        Object.assign(FastPlayStudio.prototype, {
+            normalizeSettings(raw) {
+                const out = { ...FP_DEFAULT_SETTINGS };
+                if (!raw || typeof raw !== 'object') return out;
+                Object.keys(FP_DEFAULT_SETTINGS).forEach(k => {
+                    const v = raw[k], d = FP_DEFAULT_SETTINGS[k];
+                    if (typeof d === 'boolean') { if (typeof v === 'boolean') out[k] = v; }
+                    else if (FP_SETTING_CHOICES[k] && FP_SETTING_CHOICES[k].includes(String(v))) out[k] = String(v);
+                });
+                return out;
+            },
+
+            loadSettings() {
+                let pr = {};
+                try { pr = JSON.parse(localStorage.getItem(this.STORAGE_KEY + '_prefs') || '{}') || {}; } catch (_) {}
+                const raw = { ...(pr.settings || {}) };
+                if (!pr.settings && pr.labelMode) raw.labelMode = pr.labelMode;      // older builds kept only this one
+                this.settings = this.normalizeSettings(raw);
+                this.settingsAt = Number(pr.settingsAt) || 0;
+            },
+
+            saveSettings(patch, opts = {}) {
+                this.settings = this.normalizeSettings({ ...this.settings, ...patch });
+                this.settingsAt = opts.at || Date.now();
+                this.savePrefs({ settings: this.settings, settingsAt: this.settingsAt, labelMode: this.settings.labelMode });
+                if (!opts.fromSync && this.syncState && this.syncState.enabled) this.afterLocalSave();
+                if (this.isSettingsOpen()) { this.renderSettingsForm(); this.flashSettingsSaved(); }
+            },
+
+            // Put the saved defaults into effect: toolbar toggles, line color, labels, speed, PDF layout
+            applySettings() {
+                const s = this.settings;
+                this.anchorSnap = s.anchorSnap; this.autoCurve = s.autoCurve; this.showGuides = s.showGuides; this.onionSkin = s.onionSkin;
+                this.syncAnchorSnapUI();
+                Object.entries(FP_SETTINGS_TOGGLE_UI).forEach(([key, [id, onCls]]) => {
+                    const btn = document.getElementById(id);
+                    if (!btn) return;
+                    onCls.split(' ').forEach(c => btn.classList.toggle(c, !!this[key]));
+                    ['border-slate-700', 'text-slate-400'].forEach(c => btn.classList.toggle(c, !this[key]));
+                });
+                this.strokeColor = s.strokeColor;
+                document.querySelectorAll('.swatch-btn').forEach(b => {
+                    const on = b.dataset.swatch === s.strokeColor;
+                    b.classList.toggle('border-2', on); b.classList.toggle('border-orange-400', on);
+                    b.classList.toggle('border', !on); b.classList.toggle('border-slate-600', !on);
+                });
+                this.labelMode = s.labelMode;
+                const lm = document.getElementById('label-mode-select'); if (lm) lm.value = s.labelMode;
+                const sp = document.getElementById('anim-speed-select'); if (sp) sp.value = s.animSpeed;
+                if (this.animState) this.animState.speed = parseFloat(s.animSpeed) || 1;
+                const cols = document.getElementById('playsheet-cols-select'); if (cols) cols.value = s.sheetCols;
+                if (this.renderFrameStrip) this.renderFrameStrip();
+                this.renderCourt();
+            },
+
+            setupSettings() {
+                this.loadSettings();
+                this.applySettings();
+                const on = (id, fn) => document.getElementById(id)?.addEventListener('click', fn);
+                on('btn-settings', () => this.openSettings());
+                on('btn-open-settings-side', () => { this.closeDrawersOnMobile(); this.openSettings(); });
+                on('btn-close-settings', () => this.closeSettings());
+                on('btn-settings-reset', () => {
+                    this.saveSettings({ ...FP_DEFAULT_SETTINGS });
+                    this.applySettings();
+                    this.showToast('Settings reset to defaults');
+                });
+                on('btn-settings-apply-all', () => this.applyCourtDefaultsToPlaybook());
+                const modal = document.getElementById('settings-modal');
+                modal?.addEventListener('click', (e) => { if (e.target === modal) this.closeSettings(); });
+                modal?.querySelectorAll('[data-setting]').forEach(el => el.addEventListener('change', () => {
+                    const key = el.dataset.setting;
+                    const val = el.type === 'checkbox' ? el.checked : key === 'hoopBottom' ? el.value === 'true' : el.value;
+                    this.saveSettings({ [key]: val });
+                    this.applySettings();
+                }));
+                modal?.querySelectorAll('.set-color').forEach(b => b.addEventListener('click', () => {
+                    this.saveSettings({ strokeColor: b.dataset.color });
+                    this.applySettings();
+                }));
+
+                // Changes made with the toolbar are remembered too
+                const remember = (patch) => this.saveSettings(patch);
+                on('anchor-snap-btn', () => remember({ anchorSnap: this.anchorSnap }));
+                on('curved-mode-btn', () => remember({ autoCurve: this.autoCurve }));
+                document.querySelectorAll('.swatch-btn').forEach(b => b.addEventListener('click', () => remember({ strokeColor: this.strokeColor })));
+                document.getElementById('anim-speed-select')?.addEventListener('change', (e) => remember({ animSpeed: e.target.value }));
+                document.getElementById('playsheet-cols-select')?.addEventListener('change', (e) => remember({ sheetCols: e.target.value }));
+                const wrap = (name, after) => { const orig = this[name]; this[name] = (...a) => { const r = orig.apply(this, a); after(); return r; }; };
+                wrap('toggleOnionSkin', () => remember({ onionSkin: this.onionSkin }));
+                wrap('toggleGuides', () => remember({ showGuides: this.showGuides }));
+                wrap('setLabelMode', () => { if (this.settings.labelMode !== this.labelMode) remember({ labelMode: this.labelMode }); });
+                // Starter plays follow the court defaults as well
+                const starters = this.createStarterPlays;
+                this.createStarterPlays = (...a) => starters.apply(this, a).map(p => ({ ...p, courtRules: this.settings.courtRules, courtTheme: this.settings.courtTheme, hoopBottom: this.settings.hoopBottom }));
+                // A reload from the back/forward cache resets some menus; put the saved values back
+                window.addEventListener('pageshow', (e) => { if (e.persisted) { this.loadSettings(); this.applySettings(); } });
+                // Ctrl + , (Cmd + , on Mac) opens Settings
+                document.addEventListener('keydown', (e) => {
+                    if ((e.ctrlKey || e.metaKey) && e.key === ',') { e.preventDefault(); if (!this.getOpenModal()) this.openSettings(); }
+                });
+            },
+
+            isSettingsOpen() { return !!document.getElementById('settings-modal')?.classList.contains('flex'); },
+
+            openSettings() {
+                const m = document.getElementById('settings-modal');
+                if (!m) return;
+                if (this.tour) this.endTour();
+                this.renderSettingsForm();
+                m.classList.remove('hidden'); m.classList.add('flex');
+                setTimeout(() => document.getElementById('set-courtRules')?.focus({ preventScroll: true }), 30);
+            },
+            closeSettings() {
+                const m = document.getElementById('settings-modal');
+                if (!m) return;
+                m.classList.add('hidden'); m.classList.remove('flex');
+            },
+
+            renderSettingsForm() {
+                const s = this.settings, m = document.getElementById('settings-modal');
+                if (!m) return;
+                m.querySelectorAll('[data-setting]').forEach(el => {
+                    const v = s[el.dataset.setting];
+                    if (el.type === 'checkbox') el.checked = !!v; else el.value = String(v);
+                });
+                m.querySelectorAll('.set-color').forEach(b => {
+                    const on = b.dataset.color === s.strokeColor;
+                    b.classList.toggle('border-orange-400', on); b.classList.toggle('ring-2', on); b.classList.toggle('ring-orange-400/40', on);
+                    b.classList.toggle('border-slate-600', !on);
+                    b.setAttribute('aria-pressed', on ? 'true' : 'false');
+                });
+                const note = document.getElementById('settings-sync-note');
+                if (note) note.textContent = this.syncState && this.syncState.enabled
+                    ? 'Settings are saved on this device and follow you to your other devices through Google Drive sync.'
+                    : 'Settings are saved on this device. Turn on Google Drive sync (Save / Load) to use them on your other devices too.';
+                const apply = document.getElementById('btn-settings-apply-all');
+                if (apply) apply.disabled = !this.plays.length;
+            },
+
+            flashSettingsSaved() {
+                const n = document.getElementById('settings-saved-note');
+                if (!n) return;
+                n.textContent = 'Saved ✓';
+                n.classList.add('text-emerald-300');
+                clearTimeout(this._settingsNoteTimer);
+                this._settingsNoteTimer = setTimeout(() => { n.textContent = 'Changes save automatically on this device.'; n.classList.remove('text-emerald-300'); }, 1600);
+            },
+
+            // Bring existing plays in line with the default markings and theme (undoable)
+            applyCourtDefaultsToPlaybook() {
+                const s = this.settings, plays = this.plays;
+                if (!plays.length) return this.showToast('This playbook has no plays yet', 'info');
+                const changed = plays.filter(p => p.courtRules !== s.courtRules || p.courtTheme !== s.courtTheme).length;
+                if (!changed) return this.showToast('Every play already uses these markings and theme', 'info');
+                const before = this.snapshotPlaybook();
+                this.backupPlaybook();
+                plays.forEach(p => { p.courtRules = s.courtRules; p.courtTheme = s.courtTheme; });
+                this.courtTheme = s.courtTheme; this.defaultRules = s.courtRules;
+                this.scheduleSave(); this.syncAllUI(); this.renderCourt();
+                const names = { nba: 'NBA', ncaa: 'NCAA', nfhs: 'High School', fiba: 'FIBA' };
+                this.showToast(`Updated ${changed} play${changed === 1 ? '' : 's'} to ${names[s.courtRules]} markings`, 'success', 'Undo', () => this.restorePlaybook(before), 8000);
             }
         });
 
