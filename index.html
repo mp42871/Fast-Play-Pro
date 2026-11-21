@@ -401,6 +401,13 @@
                     </div>
                 </div>
 
+                <!-- Support the app -->
+                <div class="p-2.5 border-t border-slate-800 shrink-0">
+                    <a id="btn-coffee-side" href="https://buymeacoffee.com/justinprice" target="_blank" rel="noopener noreferrer" class="w-full min-h-[34px] flex items-center justify-center space-x-1.5 bg-[#ffdd00] hover:bg-[#ffe633] active:scale-95 text-slate-900 text-xs font-bold py-1.5 rounded-lg shadow transition" title="Support FastPlay Pro on Buy Me a Coffee (opens a new tab)">
+                        <i class="ph-fill ph-coffee text-sm"></i><span>Buy me a coffee</span>
+                    </a>
+                </div>
+
                 <!-- Keyboard Shortcuts (Desktop) -->
                 <div class="hidden lg:block p-2.5 border-t border-slate-800 bg-slate-950/60 text-[10px] text-slate-400 space-y-1 shrink-0">
                     <div class="flex justify-between"><span>Undo / Redo:</span><kbd class="font-mono text-slate-300 bg-slate-800 px-1 rounded">Ctrl+Z / Y</kbd></div>
@@ -1164,6 +1171,10 @@
                     <p id="settings-sync-note" class="text-[11px] text-slate-400 flex-1 min-w-[180px]">Settings are saved on this device.</p>
                     <button id="btn-settings-reset" class="min-h-[32px] px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 font-semibold transition">Reset to Defaults</button>
                 </div>
+                <div class="border-t border-slate-800 pt-3.5 flex flex-wrap items-center justify-between gap-2">
+                    <p class="text-[11px] text-slate-400 flex-1 min-w-[180px]">Enjoying FastPlay Pro? It's free; a coffee helps keep it going.</p>
+                    <a id="btn-coffee-settings" href="https://buymeacoffee.com/justinprice" target="_blank" rel="noopener noreferrer" class="min-h-[32px] inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-[#ffdd00] hover:bg-[#ffe633] text-slate-900 font-bold transition"><i class="ph-fill ph-coffee text-sm"></i><span>Buy me a coffee</span></a>
+                </div>
             </div>
         </div>
     </div>
@@ -1252,6 +1263,7 @@
                     <div class="min-w-0"><h2 class="text-sm font-bold text-white">Help Center &amp; Tutorial</h2><p class="text-[11px] text-slate-400 truncate">Everything FastPlay Pro does, and how to do it</p></div>
                 </div>
                 <input id="help-search" type="search" placeholder="Search help (e.g. bend, wristband, offline)" autocomplete="off" class="order-last sm:order-none w-full sm:w-64 bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-sky-400" />
+<a id="btn-coffee-help" href="https://buymeacoffee.com/justinprice" target="_blank" rel="noopener noreferrer" class="hidden sm:inline-flex min-h-[34px] items-center space-x-1 px-3 rounded-lg bg-[#ffdd00] hover:bg-[#ffe633] text-slate-900 text-xs font-bold" title="Support FastPlay Pro on Buy Me a Coffee (opens a new tab)"><i class="ph-fill ph-coffee text-sm"></i><span>Buy me a coffee</span></a>
                 <button id="btn-help-tour" class="min-h-[34px] px-3 rounded-lg bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold">Take the Tour</button>
                 <button id="btn-close-help" class="min-w-[34px] min-h-[34px] flex items-center justify-center rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-lg leading-none" aria-label="Close help">&times;</button>
             </div>
@@ -6609,6 +6621,8 @@ body.fv-menu-open .fv-side{transform:none}body.fv-menu-open .fv-scrim{display:bl
 </ol>
 <div class="tip">Tip: open <b>Settings</b> (the gear at the top, or <kbd>Ctrl</kbd>+<kbd>,</kbd>) first to choose your court markings (for example High School or NCAA), court size and drawing defaults, so every new play starts the way you like.</div>
 <div class="tip">Press <kbd>?</kbd> anywhere to open this Help Center, and use the search box above to jump to any topic.</div>
+<h4>Support FastPlay Pro</h4>
+<p>FastPlay Pro is free. If it helps your team, you can say thanks with a coffee: <a href="https://buymeacoffee.com/justinprice" target="_blank" rel="noopener noreferrer" style="color:#fde047;font-weight:700;text-decoration:underline">buymeacoffee.com/justinprice</a> (also at the bottom of the Playbook sidebar).</p>
 ${act('tour', 'Take the guided tour')} ${act('settings', 'Open Settings')} ${act('templates', 'Open the template library')} ${act('newplay', 'Create a new play')} ${act('drive', 'Load my plays from Google Drive')}` },
 
                     { id: 'layout', title: 'The Screen Layout', html: `
