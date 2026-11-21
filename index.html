@@ -567,19 +567,26 @@
                     <!-- COURT ZOOM (pinch with two fingers, Ctrl + scroll, or these buttons) -->
                     <div id="court-zoom-controls" class="absolute top-2 right-2 z-[5] flex items-center bg-slate-900/90 border border-slate-700 rounded-lg shadow-lg overflow-hidden no-print">
                         <button id="btn-zoom-out" class="w-8 h-8 flex items-center justify-center text-slate-200 hover:bg-slate-800 disabled:opacity-30 disabled:hover:bg-transparent" title="Zoom out (-)" aria-label="Zoom out"><i class="ph-bold ph-minus text-sm"></i></button>
-                        <button id="btn-zoom-reset" class="h-8 min-w-[46px] px-1 text-[11px] font-mono font-bold text-slate-200 hover:bg-slate-800 border-x border-slate-700" title="Fit whole court (0)" aria-label="Fit whole court">100%</button>
+                        <button id="btn-zoom-reset" class="h-8 min-w-[46px] px-1 text-[11px] font-mono font-bold text-slate-200 hover:bg-slate-800 border-x border-slate-700" title="Fit whole court (0). Zoomed in? Scroll to move up/down, Shift + scroll to move sideways, or hold Space and drag." aria-label="Fit whole court">100%</button>
                         <button id="btn-zoom-in" class="w-8 h-8 flex items-center justify-center text-slate-200 hover:bg-slate-800 disabled:opacity-30 disabled:hover:bg-transparent" title="Zoom in (+)" aria-label="Zoom in"><i class="ph-bold ph-plus text-sm"></i></button>
                     </div>
 
                     <!-- EMPTY PLAYBOOK OVERLAY -->
-                    <div id="empty-playbook-overlay" class="hidden absolute inset-0 z-10 flex items-center justify-center p-3 bg-slate-950/65 backdrop-blur-[2px]">
-                        <div class="bg-slate-900 border border-slate-700 rounded-2xl p-4 sm:p-6 max-w-sm w-full text-center shadow-2xl space-y-3.5">
-                            <div class="w-11 h-11 rounded-xl bg-orange-500/20 border border-orange-500/40 text-orange-400 flex items-center justify-center mx-auto">
+                    <div id="empty-playbook-overlay" class="hidden absolute inset-0 z-10 flex overflow-y-auto p-2 sm:p-3 bg-slate-950/65 backdrop-blur-[2px]">
+                        <div class="m-auto bg-slate-900 border border-slate-700 rounded-2xl p-3.5 sm:p-6 max-w-sm w-full text-center shadow-2xl space-y-3 sm:space-y-3.5">
+                            <div class="w-11 h-11 rounded-xl bg-orange-500/20 border border-orange-500/40 text-orange-400 hidden sm:flex items-center justify-center mx-auto">
                                 <i class="ph-fill ph-basketball text-2xl"></i>
                             </div>
                             <div>
                                 <h2 class="text-base font-extrabold text-white">Your Playbook is Empty</h2>
                                 <p class="text-xs text-slate-400 mt-1 leading-relaxed">Create a new play to drag players and draw actions, or import a saved <code class="text-slate-300">.json</code> playbook.</p>
+                            </div>
+                            <!-- Returning on a new computer or browser: one tap brings everything back from Google Drive -->
+                            <div id="empty-drive-box" class="hidden rounded-xl border border-sky-500/50 bg-sky-500/10 p-3 space-y-2 text-left">
+                                <p id="empty-drive-text" class="text-[11px] text-sky-100 leading-relaxed">Used FastPlay Pro on another computer or browser? Sign in to bring back your playbooks from Google Drive.</p>
+                                <button id="btn-empty-drive" class="w-full min-h-[38px] flex items-center justify-center space-x-1.5 bg-sky-600 hover:bg-sky-500 active:scale-95 disabled:opacity-60 disabled:active:scale-100 text-white text-xs font-bold px-4 py-2 rounded-xl shadow transition">
+                                    <i id="btn-empty-drive-icon" class="ph-bold ph-google-drive-logo text-sm"></i><span id="btn-empty-drive-label">Load My Plays from Google Drive</span>
+                                </button>
                             </div>
                             <div class="flex flex-col gap-2 text-xs">
                                 <button id="btn-empty-new-play" class="w-full min-h-[38px] flex items-center justify-center space-x-1.5 bg-orange-500 hover:bg-orange-600 active:scale-95 text-white font-bold px-4 py-2 rounded-xl shadow shadow-orange-500/25 transition">
@@ -6519,7 +6526,9 @@ body.fv-menu-open .fv-side{transform:none}body.fv-menu-open .fv-scrim{display:bl
                 return [
                     { id: 'start', title: 'Getting Started', html: `
 <h3>Welcome to FastPlay Pro</h3>
-<p>FastPlay Pro is a basketball playbook studio that runs entirely on your device. You draw plays on a court, split them into frames (steps), animate them, and turn them into PDFs, videos, call sheets and a read-only viewer for your players. Nothing is uploaded: your work saves automatically in this browser.</p>
+<p>FastPlay Pro is a basketball playbook studio that runs on your device. You draw plays on a court, split them into frames (steps), animate them, and turn them into PDFs, videos, call sheets and a read-only viewer for your players. Your work saves automatically on this device, and the app keeps working without internet.</p>
+<h4>Coming back on another computer or browser?</h4>
+<p>If you turned on <b>Google Drive sync</b> before, tap <b>Load My Plays from Google Drive</b> on the "Your Playbook is Empty" screen (or open <b>Save / Load</b> &rarr; <b>Connect Google Drive</b>) and sign in with the same Google account. All your playbooks come back. See <i>Sync Between Devices</i>.</p>
 <h4>Your first play in 60 seconds</h4>
 <ol>
 <li>Click <b>New Play</b> in the left sidebar (or open <b>Templates</b> and add a ready-made play).</li>
@@ -6530,7 +6539,7 @@ body.fv-menu-open .fv-side{transform:none}body.fv-menu-open .fv-scrim{display:bl
 <li>Press <b>Run Play</b> to watch it animate, then <b>PDF</b> to print it.</li>
 </ol>
 <div class="tip">Tip: press <kbd>?</kbd> anywhere to open this Help Center, and use the search box above to jump to any topic.</div>
-${act('tour', 'Take the guided tour')} ${act('templates', 'Open the template library')} ${act('newplay', 'Create a new play')}` },
+${act('tour', 'Take the guided tour')} ${act('templates', 'Open the template library')} ${act('newplay', 'Create a new play')} ${act('drive', 'Load my plays from Google Drive')}` },
 
                     { id: 'layout', title: 'The Screen Layout', html: `
 <h3>Where everything is</h3>
@@ -6540,7 +6549,8 @@ ${act('tour', 'Take the guided tour')} ${act('templates', 'Open the template lib
 <li><b>Play title and category</b>: rename the play and file it under Half-Court Man, Zone Offense, BLOB, SLOB, Transition, Press Break or Practice Drill.</li>
 <li><b>Half / Full</b>: half-court or full-court diagram. <b>Hoop Top / Bottom</b>: which end the basket is drawn at.</li>
 <li><b>Theme</b> (Hardwood, Slate Dark, Clean White) and <b>court markings</b> (NBA, NCAA, High School, FIBA).</li>
-<li><b>Saved</b> indicator, <b>Help</b>, <b>Huddle</b>, <b>Run Play</b>, <b>PDF</b> (the export window) and <b>Save / Load</b>.</li>
+<li><b>Status</b>: <b>Saved</b> when your work is stored on this device, <b>Synced</b> when it is also in Google Drive. Amber <b>Sync</b> means Google needs you to sign in again: tap it. Tap the status any time to sync right away.</li>
+<li><b>Huddle</b>, <b>Run Play</b>, <b>PDF</b> (the export window), <b>Save / Load</b> (backups, import, Google Drive sync, install) and <b>Help</b>. On smaller screens some of these show only their icon; hover or long-press for the name.</li>
 </ul>
 <p>On narrower screens the title, Half/Full, hoop, category, theme and court markings move to a second scrolling row under the top bar.</p>
 <h4>Left sidebar</h4>
@@ -6548,7 +6558,8 @@ ${act('tour', 'Take the guided tour')} ${act('templates', 'Open the template lib
 <li><b>Sets &amp; Defense</b> tab: offensive formations, full-court sets and presses, transform tools (mirror, flip, copy) and defensive overlays.</li></ul>
 <h4>Center</h4>
 <ul><li><b>Toolbar</b>: drawing tools, undo/redo, Snap, Curve, Ghost, Guides, Steps, label mode, colors, delete and Clear.</li>
-<li><b>Court</b>: where you draw. <b>Sequencer</b> (bottom): the frames of the play.</li></ul>
+<li><b>Court</b>: where you draw. The <b>&minus; / 100% / +</b> buttons at its top right zoom in and out (see <i>Court Options</i>).</li>
+<li><b>Sequencer</b> (bottom): the frames of the play.</li></ul>
 <h4>Right sidebar</h4>
 <p><b>Element Inspector</b> (edit whatever is selected), <b>Coaching Points</b> for the current frame, <b>Tags</b>, <b>Series / Folder</b> and <b>Call #</b>.</p>` },
 
@@ -6563,6 +6574,8 @@ ${act('tour', 'Take the guided tour')} ${act('templates', 'Open the template lib
 <p>Type a folder name in <b>Series / Folder</b> (right sidebar), such as <i>Horns Series</i>. Plays are then grouped under collapsible folder headings; click a heading to collapse or expand it.</p>
 <h4>Call numbers</h4>
 <p><b>Call #</b> is the number or word you call from the bench ("41", "Fist"). It shows before the play name and is used on call sheets and wristbands. Leave it empty and those exports number plays automatically.</p>
+<h4>Importing a whole playbook</h4>
+<p>In <b>Save / Load</b>, <b>Import</b> a playbook file (.json). If the open playbook already has plays, choose <b>Import as New Playbook</b> to keep them separate, or <b>Merge</b> / <b>Replace</b>. Folders, tags and notes in the file come along.</p>
 <h4>Duplicating and deleting</h4>
 <p><b>Duplicate</b> copies the open play. The trash icon on a play row deletes it after a second click, and the message that appears has <b>Undo</b>.</p>` },
 
@@ -6655,7 +6668,13 @@ ${act('tour', 'Take the guided tour')} ${act('templates', 'Open the template lib
 <li><b>Hoop Top / Bottom</b> and <b>themes</b> are saved per play too.</li>
 <li><b>Guides</b>: shows labeled landmarks (blocks, elbows, nail, slots, wings, corners, dunker spots). With guides on, players, cones, labels and line ends snap to these spots when you drag near them.</li>
 <li><b>Ghost</b> (<kbd>G</kbd>): shows the previous frame faintly behind the current one so spacing stays consistent from frame to frame.</li>
-<li><b>Zoom</b>: pinch with two fingers to zoom in on a crowded spot, and drag with two fingers to move around. On a computer use the <b>&minus; / + buttons</b> at the top right of the court, <kbd>Ctrl</kbd> + scroll (or pinch on a trackpad), scroll to move around, and <kbd>0</kbd> to see the whole court again. Zoom only changes your view: exports and PDFs always show the whole court.</li></ul>` },
+<li><b>Zoom</b>: get closer to a crowded spot. Zoom only changes your view: exports and PDFs always show the whole court, and switching plays shows the whole court again.</li></ul>
+<h4>Zooming and moving around</h4>
+<table><tr><th></th><th>Zoom</th><th>Move around while zoomed</th></tr>
+<tr><td><b>Phone / tablet</b></td><td>Pinch with two fingers</td><td>Drag with two fingers</td></tr>
+<tr><td><b>Trackpad</b></td><td>Pinch, or the <b>&minus; / +</b> buttons</td><td>Swipe with two fingers in any direction</td></tr>
+<tr><td><b>Mouse</b></td><td><kbd>Ctrl</kbd> + scroll wheel, the <b>&minus; / +</b> buttons, or <kbd>+</kbd> / <kbd>&minus;</kbd></td><td>Scroll = up / down, <kbd>Shift</kbd> + scroll = sideways, or hold <kbd>Space</kbd> and drag (middle-button drag works too)</td></tr></table>
+<p>Press <kbd>0</kbd> or click the percentage between the buttons to see the whole court again.</p>` },
 
                     { id: 'animation', title: 'Animation & Timing', html: `
 <h3>Running your play</h3>
@@ -6760,6 +6779,11 @@ ${act('templates', 'Open the template library')}` },
 <ol><li>Open <b>Save / Load</b> and tap <b>Connect Google Drive</b>.</li>
 <li>Choose your Google account and allow access.</li>
 <li>Do the same on your other devices. Plays already on a device are combined with the ones in Drive; nothing is replaced.</li></ol>
+<h4>On a new computer, a new browser, or after clearing your browser</h4>
+<ol><li>Open FastPlay Pro. With no plays yet you'll see <b>Your Playbook is Empty</b>.</li>
+<li>Tap <b>Load My Plays from Google Drive</b> and sign in with the same Google account.</li>
+<li>Your playbooks, rosters and practice plans load in a few seconds, and sync stays on for that browser.</li></ol>
+<p>Nothing to load? You signed in with a different Google account than the one you synced with, or sync was never turned on where you made the plays.</p>
 <h4>How it works day to day</h4>
 <ul><li>Changes sync a few seconds after you make them, when the app opens, and every couple of minutes while it's open.</li>
 <li>Tap the status at the top (<b>Synced</b>) to sync right away.</li>
@@ -6768,7 +6792,8 @@ ${act('templates', 'Open the template library')}` },
 <li>If the <b>same play</b> was changed on two devices before they synced, both versions are kept: the other one appears as <i>"(other device)"</i> so you can pick.</li>
 <li>Deleting a play on one device deletes it everywhere.</li>
 <li><b>Disconnect</b> stops syncing on that device. Your plays stay on the device and in Drive.</li></ul>
-<div class="tip">Drive sync works when FastPlay Pro is opened from its website (or installed from it), not from a downloaded copy of the page.</div>` },
+<div class="tip">Drive sync works when FastPlay Pro is opened from its website (or installed from it), not from a downloaded copy of the page or a page embedded in another site.</div>
+${act('drive', 'Connect Google Drive now')} ${act('storage', 'Open Save / Load')}` },
 
                     { id: 'offline', title: 'Working Offline', html: `
 <h3>Using the app without internet</h3>
@@ -6796,7 +6821,9 @@ ${act('templates', 'Open the template library')}` },
 <tr><td><kbd>Space</kbd></td><td>Pause / resume while a play runs (Run in Huddle Mode)</td></tr>
 <tr><td><kbd>&larr;</kbd> <kbd>&rarr;</kbd></td><td>Jump 1 s while running; change frames in Huddle Mode</td></tr>
 <tr><td><kbd>+</kbd> / <kbd>&minus;</kbd> / <kbd>0</kbd></td><td>Zoom the court in / out / show the whole court</td></tr>
-<tr><td><kbd>Ctrl</kbd> + scroll</td><td>Zoom at the pointer (scroll alone moves around while zoomed)</td></tr>
+<tr><td><kbd>Ctrl</kbd> + scroll</td><td>Zoom at the pointer</td></tr>
+<tr><td>Scroll / <kbd>Shift</kbd> + scroll</td><td>While zoomed in: move up and down / sideways</td></tr>
+<tr><td><kbd>Space</kbd> + drag</td><td>While zoomed in: move the court in any direction</td></tr>
 <tr><td><kbd>?</kbd></td><td>Open this Help Center</td></tr></table>` },
 
                     { id: 'faq', title: 'Troubleshooting & FAQ', html: `
@@ -6807,16 +6834,24 @@ ${act('templates', 'Open the template library')}` },
 <p>The line's end isn't attached. Select the line and click <b>Snap Nearest</b> in the Inspector, or drag its end handle onto the player with <b>Snap</b> on. Moving a whole line by hand detaches it on purpose.</p>
 <h4>Things animate in the wrong order.</h4>
 <p>Number the lines with <b>Step / Timing</b>. Same number = same time.</p>
+<h4>How do I scroll sideways when I'm zoomed in?</h4>
+<p>Hold <kbd>Shift</kbd> while you scroll, swipe sideways with two fingers on a trackpad, or hold <kbd>Space</kbd> and drag the court. Press <kbd>0</kbd> to see the whole court.</p>
+<h4>The status says "Sync" in amber.</h4>
+<p>Google sign-ins last about an hour. Tap the status and sign in again; your work kept saving on the device meanwhile.</p>
+<h4>I signed in on a new computer but my plays didn't appear.</h4>
+<p>Make sure it's the same Google account you synced with (the account is shown in Save / Load). If the computer where you made the plays never had sync turned on, connect Drive there first.</p>
 <h4>The PDF button says the engine is loading or unavailable.</h4>
-<p>You're offline without the <code>vendor/jspdf.umd.min.js</code> file. Use <b>Print</b>, or see <i>Working Offline</i>.</p>
+<p>The PDF library couldn't load. Reload the page once while online, or use <b>Print</b>. See <i>Working Offline</i>.</p>
 <h4>The video looks choppy.</h4>
 <p>Video records in real time. Keep the tab visible and avoid other heavy apps while it records, or export a GIF instead.</p>
-<h4>"Local storage full".</h4>
-<p>Export each playbook, then delete plays or playbooks you no longer need (large logos and long practice lists use the most space).</p>
+<h4>"Could not save in this browser".</h4>
+<p>The browser refused to store more (very rare: there's room for very large playbooks). Export a .json backup right away, then check that the device isn't out of space and that you're not in a private window.</p>
 <h4>The page looks unstyled.</h4>
-<p>The styling library couldn't load (offline). See <i>Working Offline</i>.</p>
+<p>The app's files didn't finish loading. Reload once while online; after that it works offline. See <i>Working Offline</i>.</p>
+<h4>How do I install it like an app?</h4>
+<p>See <i>Working Offline</i>, or use <b>Install</b> in Save / Load when your browser offers it.</p>
 <h4>Is my data private?</h4>
-<p>Yes. Nothing leaves your device unless you export a file and share it yourself.</p>` }
+<p>Yes. Your plays stay on your device. If you turn on Drive sync, they're also saved in one file in <b>your own</b> Google Drive, which only you can see. Nothing else leaves your device unless you export and share a file yourself.</p>` }
                 ];
             }
 
@@ -6866,17 +6901,20 @@ ${act('templates', 'Open the template library')}` },
                 if (a === 'tour') { this.closeHelp(); this.startTour(); }
                 else if (a === 'templates') { this.closeHelp(); this.openTemplatesModal(); }
                 else if (a === 'newplay') { this.closeHelp(); this.createNewPlay(); }
+                else if (a === 'storage') { this.closeHelp(); this.openStorageModal(); }
+                else if (a === 'drive') { this.closeHelp(); this.driveConnect(); }
             }
 
             // ---- Guided tour ----
             tourSteps() {
                 return [
-                    { title: 'Welcome to FastPlay Pro', body: 'This 2-minute tour points out every part of the studio. Use Next / Back, or press the arrow keys. You can reopen it anytime from Help.' },
+                    { title: 'Welcome to FastPlay Pro', body: 'This 2-minute tour points out every part of the studio. Use Next / Back, or press the arrow keys. You can reopen it anytime from Help. Used FastPlay Pro somewhere else? Load your plays from Google Drive in Save / Load.' },
                     { sel: ['#book-select'], side: 'left', title: 'Playbooks', body: 'Switch between playbooks here (Varsity, JV, an opponent scout...). The buttons beside it create, rename and delete playbooks.' },
                     { sel: ['#play-library-list'], side: 'left', title: 'Your plays', body: 'Every play in the open playbook, grouped by Series / Folder when you use folders. Search and filter above; New Play and Duplicate are just above the list.' },
                     { sel: ['#btn-open-templates'], side: 'left', title: 'Templates, Roster, Practice, Study', body: 'Add ready-made plays and drills, enter your roster, plan timed practices, and quiz players on where they go.' },
                     { sel: ['#drawing-toolbar'], title: 'Drawing tools', body: 'Pick a line type (Cut, Pass, Dribble, Screen, DHO, Shot, Closeout, Lob), then drag from a player. Also: add players, the ball, cones, areas, text, pen and highlighter.' },
                     { sel: ['#basketball-court'], title: 'The court', body: 'Drag players to move them. With Select, click any line to edit it; double-click a selected line to add a bend point for curls and V-cuts. Drag on empty court to select several things.' },
+                    { sel: ['#court-zoom-controls'], title: 'Zoom', body: 'Zoom in on crowded spots: pinch with two fingers, use these buttons, or Ctrl + scroll. While zoomed, drag with two fingers (touch), or scroll, Shift + scroll and Space + drag (computer). 100% shows the whole court.' },
                     { sel: ['#anchor-snap-btn'], title: 'Snap, Curve, Ghost, Guides', body: 'Snap attaches lines to players so they follow them. Curve bends lines naturally. Ghost shows the previous frame. Guides show court landmarks and snap players to them.' },
                     { sel: ['#btn-number-steps'], title: 'Steps = timing', body: 'Number the lines 1, 2, 3. The numbers print on the diagram and control animation order: the same number happens at the same time.' },
                     { sel: ['#label-mode-select'], title: 'Positions, numbers or names', body: 'After entering a Roster, show jersey numbers or player names instead of 1 to 5. It carries into every export.' },
@@ -6887,7 +6925,8 @@ ${act('templates', 'Open the template library')}` },
                     { sel: ['#court-rules-select', '#mobile-court-rules'], title: 'Court options', body: 'Half or full court, hoop at top or bottom, theme, and NBA / NCAA / High School / FIBA markings.' },
                     { sel: ['#btn-huddle'], title: 'Huddle Mode', body: 'A full-screen court for timeouts with a quick chalk pen that is never saved.' },
                     { sel: ['#btn-open-playsheet'], title: 'Export', body: 'PDF PlaySheet, print, PNG / SVG images, MP4 video and GIF. Whole Playbook opens the Publisher for multi-play PDFs, call sheets, wristbands and the Team Viewer.' },
-                    { sel: ['#btn-open-storage'], title: 'Save / Load', body: 'Work saves automatically on this device. Turn on Google Drive sync to have your plays on every device, export .json backups, and import plays from other coaches here.' },
+                    { sel: ['#top-save-pill', '#mobile-save-pill'], title: 'Saved & synced', body: 'Shows that your work is saved on this device (Saved) and in Google Drive (Synced). Amber Sync means Google wants you to sign in again: tap it. Tap anytime to sync now.' },
+                    { sel: ['#btn-open-storage'], title: 'Save / Load', body: 'Turn on Google Drive sync to have your plays on every computer, phone and browser, install the app, export .json backups, and import playbooks (as a new playbook or into this one).' },
                     { sel: ['#btn-help'], title: 'Help is always here', body: 'Open the Help Center (or press ?) for step-by-step instructions on everything. That\'s the tour. Go draw something!' }
                 ];
             }
@@ -6982,7 +7021,8 @@ ${act('templates', 'Open the template library')}` },
                 try { seen = !!JSON.parse(localStorage.getItem(this.STORAGE_KEY + '_prefs') || '{}').tourSeen; } catch (_) {}
                 if (seen) return;
                 setTimeout(() => {
-                    if (this.getOpenModal() || this.tour) return;
+                    // Someone loading their plays from Google Drive isn't new: don't cover the "Welcome back" message
+                    if (this.getOpenModal() || this.tour || (this.syncState && this.syncState.enabled)) return;
                     this.showToast('New to FastPlay Pro? Take the 2-minute tour', 'info', 'Start Tour', () => this.startTour(), 12000);
                     this.savePrefs({ tourSeen: true });
                 }, 1200);
@@ -7144,6 +7184,7 @@ ${act('templates', 'Open the template library')}` },
                 this.updateUndoRedoButtons();
                 const overlay = document.getElementById('empty-playbook-overlay');
                 if (overlay) overlay.classList.toggle('hidden', !!(this.plays.length && this.getCurrentPlay()));
+                if (this.renderEmptyDrive) this.renderEmptyDrive();
             }
 
             syncPlayMetaUI() {
@@ -8210,8 +8251,9 @@ ${act('templates', 'Open the template library')}` },
                 document.addEventListener('visibilitychange', () => {
                     if (document.visibilityState === 'visible' && this.syncState.enabled) this.queueSync(600);
                 });
-                window.addEventListener('online', () => { if (this.syncState.enabled) this.queueSync(600); });
-                window.addEventListener('offline', () => { if (this.syncState.enabled) this.setSyncStatus('offline'); });
+                window.addEventListener('online', () => { this.renderEmptyDrive(); if (this.syncState.enabled) this.queueSync(600); });
+                window.addEventListener('offline', () => { this.renderEmptyDrive(); if (this.syncState.enabled) this.setSyncStatus('offline'); });
+                this.renderEmptyDrive();
                 setTimeout(() => this.maybeRemindBackup(), 5000);
             },
 
@@ -8222,6 +8264,10 @@ ${act('templates', 'Open the template library')}` },
                 on('btn-drive-disconnect', () => this.driveDisconnect());
                 on('btn-storage-persist', () => this.requestPersist(true));
                 on('btn-install-app', () => this.promptInstall());
+                on('btn-empty-drive', () => {
+                    if (this.syncState.enabled && this.driveTokenValid()) this.driveSync({ manual: true });
+                    else this.driveConnect();
+                });
                 ['top-save-pill', 'mobile-save-pill'].forEach(id => {
                     const el = document.getElementById(id);
                     if (!el) return;
@@ -8285,6 +8331,29 @@ ${act('templates', 'Open the template library')}` },
             saveSyncState() {
                 try { localStorage.setItem(this.STORAGE_KEY + '_sync', JSON.stringify(this.syncState)); } catch (_) {}
             },
+            // The "Your playbook is empty" window offers Google Drive to people coming back on a new computer or browser
+            renderEmptyDrive() {
+                const box = document.getElementById('empty-drive-box');
+                if (!box || !this.syncState) return;
+                const st = this.syncState, s = this.syncStatus;
+                const show = this.driveConfigured() && !(st.enabled && s === 'synced');
+                box.classList.toggle('hidden', !show);
+                if (!show) return;
+                // Load Google sign-in now so the button opens the Google window on the first tap
+                const overlay = document.getElementById('empty-playbook-overlay');
+                if (navigator.onLine && overlay && !overlay.classList.contains('hidden')) this.loadGIS().catch(() => {});
+                const btn = document.getElementById('btn-empty-drive'), label = document.getElementById('btn-empty-drive-label');
+                const icon = document.getElementById('btn-empty-drive-icon'), text = document.getElementById('empty-drive-text');
+                const busy = st.enabled && s === 'syncing';
+                if (btn) btn.disabled = busy || !navigator.onLine;
+                if (icon) icon.className = busy ? 'ph-bold ph-circle-notch animate-spin text-sm' : 'ph-bold ph-google-drive-logo text-sm';
+                if (label) label.textContent = busy ? 'Loading your plays...' : !navigator.onLine ? 'Connect to the internet to load your plays'
+                    : st.enabled ? 'Sign In to Load Your Plays' : 'Load My Plays from Google Drive';
+                if (text) text.textContent = st.enabled
+                    ? `This browser syncs with Google Drive${st.email ? ' (' + st.email + ')' : ''}. Sign in again to load your playbooks.`
+                    : 'Used FastPlay Pro on another computer or browser? Sign in to bring back your playbooks from Google Drive.';
+            },
+
             setSyncStatus(s) {
                 // On phones the status pill sits off-screen in the scrolling bar, so say it once per visit
                 if (s === 'needs-auth' && this.syncStatus !== 'needs-auth' && !this._authNudged && window.innerWidth < 1280) {
@@ -8298,6 +8367,7 @@ ${act('templates', 'Open the template library')}` },
                 this.syncStatus = s;
                 this.renderStatusPill();
                 this.renderSyncCard();
+                this.renderEmptyDrive();
             },
             driveClientId() {
                 let override = '';
@@ -8337,7 +8407,7 @@ ${act('templates', 'Open the template library')}` },
                 if (location.protocol === 'file:') return this.showToast('Open FastPlay Pro from its website to use Drive sync', 'info', null, null, 4500);
                 if (!this.driveClientId()) return this.showToast('Drive sync needs a one-time setup first (see Help)', 'info', 'Help', () => { this.closeStorageModal(); this.openHelp('sync'); }, 6000);
                 if (!navigator.onLine) return this.showToast('You are offline. Connect to the internet to set up sync.', 'info');
-                this.driveAuthorize(this.syncState.email ? '' : 'consent');
+                this.driveAuthorize(this.syncState.email ? '' : 'select_account');   // let people pick the right account on a shared computer
             },
 
             // Must run from a tap/click so the Google window is allowed to open
@@ -8505,7 +8575,13 @@ ${act('templates', 'Open the template library')}` },
                     this.saveSyncState();
                     this.setSyncStatus('synced');
                     if (conflicts) this.showToast(`${conflicts} play${conflicts === 1 ? ' was' : 's were'} changed on two devices. Both versions were kept ("other device").`, 'info', null, null, 7000);
-                    else if (opts.first) this.showToast(changedHere ? 'Drive sync is on. Plays from your other devices were added.' : 'Drive sync is on. Your plays are now in your Google Drive.', 'success', null, null, 4500);
+                    else if (opts.first) {
+                        const total = merged.reduce((n, b) => n + b.plays.length, 0);
+                        const msg = !file ? (total ? 'Drive sync is on. Your plays are now saved in your Google Drive.' : 'Drive sync is on. Nothing is saved in this Google Drive yet; plays you make will be saved there.')
+                            : changedHere ? `Welcome back! Loaded ${total} play${total === 1 ? '' : 's'} in ${merged.length} playbook${merged.length === 1 ? '' : 's'} from Google Drive.`
+                            : 'Drive sync is on. Your plays are now saved in your Google Drive.';
+                        this.showToast(msg, 'success', null, null, 5500);
+                    }
                     else if (opts.manual) this.showToast(changedHere ? 'Synced: updates from your other devices are in' : 'Synced with Google Drive');
                     if (this.updateStorageMeter) this.updateStorageMeter();
                 } catch (err) {
@@ -8777,6 +8853,17 @@ ${act('templates', 'Open the template library')}` },
                 const z = this.zoom.z;
                 const label = document.getElementById('btn-zoom-reset');
                 if (label) label.textContent = `${Math.round(z * 100)}%`;
+                if (z > 1 && !this._zoomTipDone) {
+                    this._zoomTipDone = true;
+                    let seen = false;
+                    try { seen = !!JSON.parse(localStorage.getItem(this.STORAGE_KEY + '_prefs') || '{}').zoomTip; } catch (_) {}
+                    if (!seen) {
+                        this.savePrefs({ zoomTip: true });
+                        const touch = window.matchMedia('(pointer: coarse)').matches;
+                        setTimeout(() => this.showToast(touch ? 'Tip: drag with two fingers to move around. Pinch out to see the whole court.'
+                            : 'Tip: scroll to move up and down, Shift + scroll to move sideways, or hold Space and drag. Press 0 to see the whole court.', 'info', null, null, 7000), 250);
+                    }
+                }
                 const out = document.getElementById('btn-zoom-out'), inn = document.getElementById('btn-zoom-in');
                 if (out) out.disabled = z <= 1.001;
                 if (inn) inn.disabled = z >= this.ZOOM_MAX - 0.001;
@@ -8817,7 +8904,20 @@ ${act('templates', 'Open the template library')}` },
                 on('btn-zoom-reset', () => this.zoomCourtTo(1));
 
                 const touches = new Map();
-                let pinch = null, before = null, mousePan = null;
+                let pinch = null, before = null, mousePan = null, spaceHeld = false;
+                const typingIn = (t) => t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable);
+                // Hold Space and drag to move around a zoomed-in court (like most drawing apps)
+                document.addEventListener('keydown', (e) => {
+                    if (e.key !== ' ' || e.repeat && spaceHeld) { if (e.key === ' ' && spaceHeld) e.preventDefault(); return; }
+                    if (typingIn(e.target) || this.getOpenModal() || this.tour || this.huddle.on || this.animState.running || !(this.zoom.z > 1)) return;
+                    e.preventDefault();
+                    spaceHeld = true; svg.style.cursor = 'grab';
+                });
+                document.addEventListener('keyup', (e) => {
+                    if (e.key !== ' ' || !spaceHeld) return;
+                    spaceHeld = false; svg.style.cursor = this.currentTool === 'select' ? 'default' : 'crosshair';
+                });
+                window.addEventListener('blur', () => { if (spaceHeld) { spaceHeld = false; svg.style.cursor = this.currentTool === 'select' ? 'default' : 'crosshair'; } });
                 const onCourt = (e) => e.target === svg || svg.contains(e.target);
 
                 // Remember the play before a finger touches it, so a pinch can take back what that finger started
@@ -8873,7 +8973,8 @@ ${act('templates', 'Open the template library')}` },
 
                 stage.addEventListener('pointerdown', (e) => {
                     if (e.pointerType === 'mouse') {
-                        if (e.button === 1 && this.zoom.z > 1 && onCourt(e)) {
+                        if ((e.button === 1 || (e.button === 0 && spaceHeld)) && this.zoom.z > 1 && onCourt(e)) {
+                            if (spaceHeld) svg.style.cursor = 'grabbing';
                             e.preventDefault(); e.stopPropagation();
                             mousePan = { id: e.pointerId, x: e.clientX, y: e.clientY };
                             try { stage.setPointerCapture(e.pointerId); } catch (_) {}
@@ -8905,7 +9006,7 @@ ${act('templates', 'Open the template library')}` },
                 }, true);
 
                 const end = (e) => {
-                    if (mousePan && e.pointerId === mousePan.id) { mousePan = null; e.stopPropagation(); return; }
+                    if (mousePan && e.pointerId === mousePan.id) { mousePan = null; e.stopPropagation(); if (spaceHeld) svg.style.cursor = 'grab'; return; }
                     if (!touches.has(e.pointerId)) return;
                     touches.delete(e.pointerId);
                     if (pinch) {
@@ -8935,6 +9036,7 @@ ${act('templates', 'Open the template library')}` },
                 document.addEventListener('keydown', (e) => {
                     const t = e.target, typing = t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable);
                     if (typing || e.ctrlKey || e.metaKey || e.altKey || this.getOpenModal() || this.tour || !this.getCurrentPlay()) return;
+                    if (e.key === ' ') return;
                     if (e.key === '+' || e.key === '=') { e.preventDefault(); this.zoomCourtTo(this.zoom.z * 1.5); }
                     else if (e.key === '-' || e.key === '_') { e.preventDefault(); this.zoomCourtTo(this.zoom.z / 1.5); }
                     else if (e.key === '0') { e.preventDefault(); this.zoomCourtTo(1); }

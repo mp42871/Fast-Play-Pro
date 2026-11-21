@@ -1,6 +1,6 @@
 /* FastPlay Pro service worker: makes the app open and work with no internet.
  * Change VERSION whenever you publish an update; open copies of the app will then offer an "Update" button. */
-const VERSION = 'fastplay-2026-11-21-3';
+const VERSION = 'fastplay-2026-11-21-4';
 const FONT_CACHE = 'fastplay-fonts';
 
 const CORE = [

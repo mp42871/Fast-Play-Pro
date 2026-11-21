@@ -7,7 +7,8 @@ A basketball playbook studio that runs in the browser: draw plays, animate them,
 - **Works offline.** After the first visit the app is cached on the device (`sw.js`) and opens with no internet. It can be installed to a phone's home screen or as a desktop app.
 - **Saves on the device.** Playbooks are stored in the browser's IndexedDB, with no 5 MB cap. The app asks the browser not to clear them.
 - **Syncs through Google Drive** (optional). Every playbook stays in sync across a coach's devices through one file in their own Drive.
-- **Zoom.** Pinch the court, use Ctrl + scroll, or the − / + buttons.
+  On a new computer or browser, the "Your Playbook is Empty" screen offers **Load My Plays from Google Drive**: one sign-in brings everything back.
+- **Zoom.** Pinch the court, use Ctrl + scroll, or the − / + buttons. While zoomed in, move around with two fingers, scroll / Shift + scroll, or Space + drag.
 
 ## Files
 
