@@ -880,6 +880,7 @@
                     <div class="flex flex-wrap items-center justify-end gap-2 pt-1">
                         <button id="btn-import-cancel" class="min-h-[34px] px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold transition">Cancel</button>
                         <button id="btn-import-replace" class="min-h-[34px] px-3 py-1.5 rounded-lg bg-red-600/90 hover:bg-red-500 text-white font-bold shadow transition">Replace Entire Playbook</button>
+                        <button id="btn-import-newbook" class="min-h-[34px] px-3 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-500 text-white font-bold shadow transition">Import as New Playbook</button>
                         <button id="btn-import-merge" class="min-h-[34px] px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold shadow transition">Merge into Current Playbook</button>
                     </div>
                 </div>
@@ -6748,7 +6749,7 @@ ${act('templates', 'Open the template library')}` },
 <li><b>Protect</b>: asks the browser never to clear your plays on its own (for example when the device is low on space). Chrome, Edge and Safari usually agree automatically, especially once the app is installed.</li>
 <li><b>Export Full Playbook</b>: a .json file of the open playbook, including its roster and practice plans.</li>
 <li><b>Export Current Play</b>: just the open play, to share with another coach.</li>
-<li><b>Import</b>: open a .json file. Importing several plays into a playbook that already has plays asks whether to <b>Merge</b> or <b>Replace</b>; both can be undone from the message that appears.</li>
+<li><b>Import</b>: open a .json file. Importing several plays into a playbook that already has plays asks whether to add them as a <b>New Playbook</b>, <b>Merge</b> them in, or <b>Replace</b> the playbook; merging and replacing can be undone from the message that appears.</li>
 <li><b>Load Starter Plays</b> and <b>Clear Playbook</b> (two clicks, undoable).</li></ul>
 <p>If FastPlay Pro is open in two tabs, the other tab asks you to reload when one saves, so neither overwrites the other.</p>` },
 
@@ -7028,14 +7029,21 @@ ${act('templates', 'Open the template library')}` },
                         imported = imported.filter(p => p && Array.isArray(p.frames) && p.frames.length > 0);
                         if (!imported.length) throw new Error('No valid plays found');
                         this.pendingImportExtras = (parsed && !Array.isArray(parsed) && (parsed.roster || parsed.practices)) ? { roster: parsed.roster, practices: parsed.practices } : null;
+                        const named = parsed && !Array.isArray(parsed) && typeof parsed.playbookName === 'string' ? parsed.playbookName.trim() : '';
+                        this.pendingImportBookName = (named || file.name.replace(/\.json$/i, '').replace(/[_-]+/g, ' ').trim() || 'Imported Playbook').slice(0, 60);
 
-                        if (this.plays.length === 0) this.completeImport(imported, 'replace');
+                        if (this.plays.length === 0) {
+                            // Filling an empty, still-unnamed playbook: give it the imported playbook's name
+                            const book = this.currentBook();
+                            if (book && named && /^my playbook$/i.test(book.name) && !this.books.some(b => b !== book && b.name.toLowerCase() === named.toLowerCase())) book.name = named.slice(0, 60);
+                            this.completeImport(imported, 'replace');
+                        }
                         else if (imported.length === 1) this.completeImport(imported, 'merge');
                         else {
                             this.pendingImportPlays = imported;
                             this.openStorageModal();
                             const summary = document.getElementById('import-choice-summary');
-                            if (summary) summary.textContent = `Found ${imported.length} plays in "${file.name}". Merge into your current ${this.plays.length}-play playbook, or replace it entirely?`;
+                            if (summary) summary.textContent = `Found ${imported.length} plays in "${file.name}". Add them as a new playbook, merge them into your current ${this.plays.length}-play playbook, or replace it entirely?`;
                             document.getElementById('import-choice-panel')?.classList.remove('hidden');
                         }
                     } catch (err) {
@@ -7886,6 +7894,18 @@ ${act('templates', 'Open the template library')}` },
                     document.getElementById('import-choice-panel')?.classList.add('hidden');
                 });
                 on('btn-import-merge', 'click', () => { if (this.pendingImportPlays) this.completeImport(this.pendingImportPlays, 'merge'); });
+                on('btn-import-newbook', 'click', () => {
+                    if (!this.pendingImportPlays) return;
+                    // A separate playbook named after the file ("My Playbook (2)" if that name is taken)
+                    const base = this.pendingImportBookName || 'Imported Playbook';
+                    let name = base, n = 2;
+                    while (this.books.some(b => b.name.toLowerCase() === name.toLowerCase())) name = `${base.slice(0, 54)} (${n++})`;
+                    const book = this.newBook(name);
+                    this.books.push(book);
+                    this.switchBook(book.id);
+                    this.completeImport(this.pendingImportPlays, 'replace');
+                    this.showToast(`Created playbook "${name}" with ${this.plays.length} play(s)`, 'success', null, null, 5000);
+                });
                 on('btn-import-replace', 'click', () => { if (this.pendingImportPlays) this.completeImport(this.pendingImportPlays, 'replace'); });
                 on('btn-modal-load-starters', 'click', () => this.completeImport(this.createStarterPlays(), this.plays.length === 0 ? 'replace' : 'merge'));
                 on('btn-modal-reset-defaults', 'click', () => this.handleClearPlaybookClick());
